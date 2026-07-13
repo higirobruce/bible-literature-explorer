@@ -10,10 +10,11 @@ import { X } from "lucide-react";
 
 interface InspectorPanelProps {
   word: string | null;
+  strongsNumber?: string;
   onClose: () => void;
 }
 
-export function InspectorPanel({ word, onClose }: InspectorPanelProps) {
+export function InspectorPanel({ word, strongsNumber, onClose }: InspectorPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export function InspectorPanel({ word, onClose }: InspectorPanelProps) {
           >
             {word ? (
               <div className="space-y-6">
-                <LexiconSection word={word} />
+                <LexiconSection word={word} strongsNumber={strongsNumber} />
                 <RelatedConceptsSection word={word} />
                 <ConnectionsSection word={word} />
               </div>

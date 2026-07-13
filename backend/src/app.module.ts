@@ -5,6 +5,7 @@ import { SearchModule } from './search/search.module';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { EntitiesModule } from './entities/entities.module';
 import { UserModule } from './user/user.module';
+import { LexiconModule } from './lexicon/lexicon.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module';
     DiscoveryModule,
     EntitiesModule,
     UserModule,
+    LexiconModule,
   ],
 })
 export class AppModule {}

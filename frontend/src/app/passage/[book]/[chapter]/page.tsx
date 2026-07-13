@@ -21,23 +21,38 @@ interface PassagePageProps {
   };
 }
 
+interface WordData {
+  position: number;
+  hebrew?: string;
+  greek?: string;
+  strongs?: string;
+}
+
 interface Verse {
   num: number;
   text: string;
+  translation?: string;
+  words?: WordData[];
+}
+
+interface SelectedWord {
+  word: string;
+  strongs?: string;
 }
 
 export default function PassagePage({ params }: PassagePageProps) {
   const { book, chapter } = params;
   const bookName = book.charAt(0).toUpperCase() + book.slice(1);
-  const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  const [selectedWord, setSelectedWord] = useState<SelectedWord | null>(null);
   const [verses, setVerses] = useState<Verse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [translation, setTranslation] = useState("web");
 
   const fetchPassage = useCallback(() => {
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:4000/api/passages/${book}/${chapter}`)
+    fetch(`http://localhost:4000/api/passages/${book}/${chapter}?translation=${translation}`)
       .then((res) => {
         if (!res.ok) throw new Error("Passage not found");
         return res.json();
@@ -50,9 +65,26 @@ export default function PassagePage({ params }: PassagePageProps) {
         setError(err.message);
         setLoading(false);
       });
-  }, [book, chapter]);
+  }, [book, chapter, translation]);
 
   useEffect(() => { fetchPassage(); }, [fetchPassage]);
+
+  const handleWordClick = useCallback((word: string) => {
+    const cleaned = word.replace(/[^a-zA-Z]/g, "").toLowerCase();
+    let strongs: string | undefined;
+
+    for (const verse of verses) {
+      if (verse.words) {
+        const wordAtPosition = verse.words.find((w) => w.strongs);
+        if (wordAtPosition?.strongs) {
+          strongs = wordAtPosition.strongs;
+          break;
+        }
+      }
+    }
+
+    setSelectedWord({ word: cleaned, strongs });
+  }, [verses]);
 
   return (
     <PageTransition className="space-y-6">
@@ -65,7 +97,7 @@ export default function PassagePage({ params }: PassagePageProps) {
         </div>
         <div className="flex items-center gap-3">
           <LayerPills />
-          <TranslationSelector />
+          <TranslationSelector value={translation} onChange={setTranslation} />
         </div>
       </div>
 
@@ -88,14 +120,14 @@ export default function PassagePage({ params }: PassagePageProps) {
       )}
 
       {!loading && !error && verses.length > 0 && (
-        <VerseList verses={verses} onWordClick={setSelectedWord} />
+        <VerseList verses={verses} onWordClick={handleWordClick} />
       )}
 
       <DiscoveryCardDeck />
 
       <ChapterNav book={book} chapter={parseInt(chapter)} totalChapters={50} />
 
-      <InspectorPanel word={selectedWord} onClose={() => setSelectedWord(null)} />
+      <InspectorPanel word={selectedWord?.word ?? null} strongsNumber={selectedWord?.strongs} onClose={() => setSelectedWord(null)} />
     </PageTransition>
   );
 }

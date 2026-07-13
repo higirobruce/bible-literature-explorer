@@ -14,6 +14,7 @@ const search_module_1 = require("./search/search.module");
 const discovery_module_1 = require("./discovery/discovery.module");
 const entities_module_1 = require("./entities/entities.module");
 const user_module_1 = require("./user/user.module");
+const lexicon_module_1 = require("./lexicon/lexicon.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,6 +27,7 @@ exports.AppModule = AppModule = __decorate([
             discovery_module_1.DiscoveryModule,
             entities_module_1.EntitiesModule,
             user_module_1.UserModule,
+            lexicon_module_1.LexiconModule,
         ],
     })
 ], AppModule);
