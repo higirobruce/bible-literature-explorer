@@ -1,10 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { PassagesModule } from './passages/passages.module';
+import { SearchModule } from './search/search.module';
+import { DiscoveryModule } from './discovery/discovery.module';
+import { EntitiesModule } from './entities/entities.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot(process.env.MONGO_URI ?? 'mongodb://localhost:27017/ble'),
+    PassagesModule,
+    SearchModule,
+    DiscoveryModule,
+    EntitiesModule,
+    UserModule,
+  ],
 })
 export class AppModule {}
