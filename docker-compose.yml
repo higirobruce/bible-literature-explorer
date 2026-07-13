@@ -1,0 +1,68 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: ble-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: ble
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: ble-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    environment:
+      NEO4J_AUTH: neo4j/ble-dev-password
+      NEO4J_PLUGINS: '["apoc"]'
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ble-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  opensearch:
+    image: opensearchproject/opensearch:2
+    container_name: ble-opensearch
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: true
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: ble-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ble-admin
+      MINIO_ROOT_PASSWORD: ble-dev-password
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  neo4j_data:
+  redis_data:
+  opensearch_data:
+  minio_data:

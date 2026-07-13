@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Literata:opsz@7..72&display=swap');
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-base: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-card: var(--bg-card);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-heading: var(--text-heading);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-border: var(--border-light);
+  --color-border-medium: var(--border-medium);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-deep-indigo: var(--color-deep-indigo);
+  --color-terracotta: var(--color-terracotta);
+  --color-olive: var(--color-olive);
+  --color-muted-copper: var(--color-muted-copper);
+  --color-stone: var(--color-stone);
+  --color-sand: var(--color-sand);
+  --color-warm-white: var(--color-warm-white);
+
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --ease-out: var(--ease-out);
+  --dur-fast: var(--dur-fast);
+  --dur-normal: var(--dur-normal);
+  --dur-slow: var(--dur-slow);
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
