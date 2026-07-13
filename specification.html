@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblical Literature Explorer — Design System &amp; Specification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Literata:opsz@7..72&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   1.  DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* --- Color palette --- */
+  --color-warm-white:   #F7F3EE;
+  --color-stone:        #8B8178;
+  --color-slate:        #3D3D3D;
+  --color-olive:        #7A8B6F;
+  --color-terracotta:   #C8664A;
+  --color-sand:         #D4C5B0;
+  --color-deep-indigo:  #1E2440;
+  --color-muted-copper: #B8735A;
+
+  /* --- Semantic tokens --- */
+  --bg-base:        var(--color-warm-white);
+  --bg-surface:     #FCFAF7;
+  --bg-card:        #FFFFFF;
+  --bg-code:        rgba(30, 36, 64, 0.06);
+  --text-primary:   var(--color-slate);
+  --text-secondary: #6B6560;
+  --text-heading:   var(--color-deep-indigo);
+  --text-muted:     #9C9590;
+  --border-light:   rgba(139, 129, 120, 0.18);
+  --border-medium:  rgba(139, 129, 120, 0.30);
+  --accent:         var(--color-terracotta);
+  --accent-hover:   #B85A40;
+  --accent-subtle:  rgba(200, 102, 74, 0.10);
+  --link:           var(--color-deep-indigo);
+  --link-hover:     var(--color-terracotta);
+  --tag-bg:         rgba(30, 36, 64, 0.06);
+  --tag-text:       var(--color-deep-indigo);
+
+  /* --- Typography --- */
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Literata', Georgia, 'Times New Roman', serif;
+  --font-mono:    'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+  --text-5xl:  3rem;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed:1.75;
+
+  /* --- Spacing --- */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* --- Radii --- */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* --- Shadows --- */
+  --shadow-sm:   0 1px 2px rgba(30, 36, 64, 0.06);
+  --shadow-md:   0 4px 12px rgba(30, 36, 64, 0.07);
+  --shadow-lg:   0 8px 30px rgba(30, 36, 64, 0.08);
+  --shadow-xl:   0 16px 48px rgba(30, 36, 64, 0.10);
+
+  /* --- Motion --- */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:   150ms;
+  --dur-normal: 250ms;
+  --dur-slow:   400ms;
+
+  /* --- Layout --- */
+  --content-max: 72rem;
+  --text-max:    40rem;
+  --sidebar-w:   16rem;
+}
+
+/* ============================================================
+   2.  BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-base);
+}
+
+/* ============================================================
+   3.  TYPOGRAPHY
+   ============================================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  color: var(--text-heading);
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: var(--text-5xl); }
+h2 { font-size: var(--text-3xl); margin-top: var(--space-16); margin-bottom: var(--space-6); }
+h3 { font-size: var(--text-2xl); margin-top: var(--space-10); margin-bottom: var(--space-4); }
+h4 { font-size: var(--text-xl); margin-top: var(--space-8); margin-bottom: var(--space-3); }
+h5 { font-size: var(--text-lg); margin-top: var(--space-6); margin-bottom: var(--space-2); }
+
+p { margin-bottom: var(--space-4); max-width: var(--text-max); }
+.lede { font-size: var(--text-lg); line-height: var(--leading-relaxed); color: var(--text-secondary); }
+
+a { color: var(--link); text-decoration: none; transition: color var(--dur-fast) var(--ease-out); }
+a:hover { color: var(--link-hover); }
+
+code, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--bg-code);
+  padding: 0.125em 0.4em;
+  border-radius: var(--radius-sm);
+}
+
+small { font-size: var(--text-sm); color: var(--text-muted); }
+
+ul, ol { margin-bottom: var(--space-4); padding-left: var(--space-6); }
+li { margin-bottom: var(--space-2); }
+
+blockquote {
+  border-left: 3px solid var(--color-terracotta);
+  padding-left: var(--space-4);
+  margin: var(--space-6) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: var(--space-12) 0;
+}
+
+/* ============================================================
+   4.  LAYOUT
+   ============================================================ */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-4);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  color: var(--text-heading);
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-6);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: var(--leading-tight);
+}
+.sidebar-logo span {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: var(--space-1);
+}
+
+.sidebar nav { margin-bottom: var(--space-6); }
+
+.sidebar-nav-group {
+  margin-bottom: var(--space-1);
+}
+
+.sidebar-nav-group-title {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: var(--space-2) var(--space-3);
+  pointer-events: none;
+}
+
+.sidebar a {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.sidebar a:hover {
+  color: var(--text-heading);
+  background: var(--tag-bg);
+}
+.sidebar a.active {
+  color: var(--text-heading);
+  font-weight: 500;
+  background: var(--accent-subtle);
+}
+
+/* --- Main content --- */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-8) var(--space-12) var(--space-24);
+  max-width: var(--content-max);
+}
+
+/* --- Section --- */
+.section {
+  margin-bottom: var(--space-12);
+}
+
+.section:first-child { margin-top: var(--space-4); }
+
+.section-header {
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.section-header h2 { margin-top: 0; margin-bottom: var(--space-2); }
+
+/* ============================================================
+   5.  COMPONENTS
+   ============================================================ */
+
+/* --- Hero --- */
+.hero {
+  padding: var(--space-20) 0 var(--space-16);
+  margin-bottom: var(--space-16);
+}
+.hero h1 { margin-bottom: var(--space-4); }
+.hero .lede { font-size: var(--text-xl); max-width: 36rem; }
+
+/* --- Badge --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.badge-neutral {
+  background: var(--tag-bg);
+  color: var(--text-secondary);
+}
+
+.badge-olive {
+  background: rgba(122, 139, 111, 0.12);
+  color: var(--color-olive);
+}
+
+/* --- Swatch grid --- */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+.swatch {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+}
+
+.swatch-preview {
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-3);
+}
+
+.swatch-info {
+  padding: var(--space-3);
+}
+
+.swatch-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-heading);
+}
+
+.swatch-hex {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* --- Type scale --- */
+.type-scale { margin: var(--space-6) 0; }
+.type-scale-item {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.type-scale-item:last-child { border-bottom: none; }
+.type-scale-label {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+
+/* --- Token table --- */
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  margin: var(--space-6) 0;
+}
+.token-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 2px solid var(--border-medium);
+}
+.token-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+.token-table tr:last-child td { border-bottom: none; }
+.token-table code { font-size: 0.8em; }
+.token-table .token-preview {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  vertical-align: middle;
+  margin-right: var(--space-2);
+  border: 1px solid var(--border-light);
+}
+
+/* --- Card --- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: box-shadow var(--dur-normal) var(--ease-out);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-title { font-family: var(--font-heading); font-size: var(--text-lg); margin-bottom: var(--space-2); }
+.card p { font-size: var(--text-sm); }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+/* --- Principle list --- */
+.principles {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+.principles li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  margin: 0;
+}
+.principles li strong {
+  display: block;
+  font-family: var(--font-heading);
+  color: var(--text-heading);
+  margin-bottom: var(--space-1);
+}
+.principles .principles-num {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  color: var(--accent);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 2rem;
+}
+
+/* --- Layer cards --- */
+.layer-stack { margin: var(--space-8) 0; }
+
+.layer-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+  transition: box-shadow var(--dur-normal) var(--ease-out);
+}
+.layer-card:hover { box-shadow: var(--shadow-md); }
+
+.layer-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  cursor: pointer;
+}
+.layer-header h4 { margin: 0; font-size: var(--text-lg); }
+.layer-body {
+  padding: 0 var(--space-6) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.layer-body ul { margin: var(--space-2) 0; }
+.layer-body ul li { margin-bottom: var(--space-1); }
+
+.layer-1 .layer-header { background: rgba(200, 102, 74, 0.06); }
+.layer-2 .layer-header { background: rgba(184, 115, 90, 0.06); }
+.layer-3 .layer-header { background: rgba(122, 139, 111, 0.06); }
+.layer-4 .layer-header { background: rgba(30, 36, 64, 0.06); }
+
+.layer-number {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: 1;
+}
+.layer-1 .layer-number { color: var(--color-terracotta); }
+.layer-2 .layer-number { color: var(--color-muted-copper); }
+.layer-3 .layer-number { color: var(--color-olive); }
+.layer-4 .layer-number { color: var(--color-deep-indigo); }
+
+/* --- Value props --- */
+.value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+.value-item {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+.value-item .value-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xl);
+}
+.value-item h5 { margin: 0 0 var(--space-2); font-size: var(--text-base); }
+.value-item p { font-size: var(--text-sm); margin: 0; }
+
+/* --- Component preview --- */
+.component-demo {
+  margin: var(--space-6) 0;
+  padding: var(--space-8);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.component-demo-inspector {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  max-width: 360px;
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+.component-demo-inspector .inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+}
+.component-demo-inspector .inspector-header strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+}
+.component-demo-inspector .inspector-close {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--tag-bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.component-demo-inspector .inspector-section {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+}
+.component-demo-inspector .inspector-section strong {
+  display: block;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+  font-family: var(--font-body);
+}
+.component-demo-inspector .inspector-tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-2);
+  background: var(--tag-bg);
+  border-radius: var(--radius-sm);
+  color: var(--tag-text);
+  margin: var(--space-1) var(--space-1) 0 0;
+}
+
+.discovery-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  max-width: 320px;
+  transition: box-shadow var(--dur-normal) var(--ease-out);
+  cursor: pointer;
+}
+.discovery-card:hover { box-shadow: var(--shadow-md); }
+.discovery-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-base);
+  flex-shrink: 0;
+}
+.discovery-card-body h5 { margin: 0 0 var(--space-1); font-size: var(--text-sm); }
+.discovery-card-body p { margin: 0; font-size: var(--text-xs); color: var(--text-muted); }
+
+/* --- Stack badge --- */
+.stack-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+.stack-badge {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-3);
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  border-radius: var(--radius-full);
+}
+
+.stack-group {
+  margin-bottom: var(--space-6);
+}
+.stack-group-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+/* --- Timeline demo --- */
+.timeline-demo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) 0;
+  overflow-x: auto;
+}
+.timeline-demo-item {
+  flex-shrink: 0;
+  width: 100px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--border-light);
+  position: relative;
+}
+.timeline-demo-item.active { background: var(--accent); height: 6px; }
+.timeline-demo-item::after {
+  content: attr(data-year);
+  position: absolute;
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* --- Knowledge graph demo --- */
+.graph-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-8);
+  position: relative;
+}
+.graph-node {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-align: center;
+  padding: var(--space-2);
+  border: 2px solid;
+  background: var(--bg-card);
+  position: relative;
+  z-index: 1;
+}
+.graph-node.central {
+  width: 100px;
+  height: 100px;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+}
+.graph-node.people    { border-color: var(--color-terracotta); color: var(--color-terracotta); }
+.graph-node.places    { border-color: var(--color-olive); color: var(--color-olive); }
+.graph-node.concepts  { border-color: var(--color-deep-indigo); color: var(--color-deep-indigo); }
+.graph-node.events    { border-color: var(--color-muted-copper); color: var(--color-muted-copper); }
+.graph-connector {
+  position: absolute;
+  height: 2px;
+  background: var(--border-medium);
+  z-index: 0;
+}
+
+/* --- Evidence badge demo --- */
+.evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.evidence-badge:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.evidence-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-terracotta);
+}
+
+/* --- Emotion grid --- */
+.emotion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+.emotion-card {
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.emotion-card .emotion-icon {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-2);
+}
+.emotion-card h5 { margin: 0 0 var(--space-1); }
+.emotion-card p { font-size: var(--text-sm); color: var(--text-secondary); margin: 0; }
+
+/* --- Nav demo --- */
+.nav-demo {
+  display: flex;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+.nav-demo a {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: var(--space-1) 0;
+  border-bottom: 2px solid transparent;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.nav-demo a:hover { color: var(--text-heading); border-bottom-color: var(--accent); }
+.nav-demo a.active { color: var(--text-heading); border-bottom-color: var(--accent); }
+
+/* --- Search demo --- */
+.search-demo {
+  padding: var(--space-4) var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  max-width: 480px;
+}
+.search-demo-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.search-demo-input span {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+}
+.search-demo-input .cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.search-demo-results {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+.search-demo-results a {
+  display: block;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.search-demo-results a:hover { background: var(--tag-bg); }
+
+/* --- Passage layout demo --- */
+.passage-demo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+.passage-demo-main {
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+.passage-demo-main .verse {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+.passage-demo-main .verse-num {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-right: var(--space-2);
+}
+.passage-demo-main .word-highlight {
+  color: var(--accent);
+  cursor: pointer;
+  border-bottom: 1px dashed var(--accent);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.passage-demo-main .word-highlight:hover { background: var(--accent-subtle); }
+.passage-demo-side {
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+.passage-demo-side h5 { margin-top: 0; margin-bottom: var(--space-3); font-size: var(--text-sm); }
+
+/* --- Workspace demo --- */
+.workspace-demo {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-2);
+  margin: var(--space-6) 0;
+  min-height: 240px;
+}
+.workspace-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* --- Map demo --- */
+.map-demo {
+  height: 200px;
+  background: linear-gradient(135deg, var(--color-sand) 0%, var(--color-warm-white) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+  margin: var(--space-6) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-demo-overlay {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   6.  RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: var(--space-6) var(--space-6) var(--space-16); }
+  h1 { font-size: var(--text-4xl); }
+  h2 { font-size: var(--text-2xl); }
+  .hero { padding: var(--space-12) 0 var(--space-8); }
+  .passage-demo { grid-template-columns: 1fr; }
+  .workspace-demo { grid-template-columns: 1fr; }
+  .swatch-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .card-grid { grid-template-columns: 1fr; }
+  .value-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+
+/* ============================================================
+   7.  PRINT
+   ============================================================ */
+@media print {
+  .sidebar { display: none; }
+  .main { max-width: 100%; padding: 0; }
+  .card, .component-demo { break-inside: avoid; }
+  .swatch-grid { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ======================================================
+       SIDEBAR
+       ====================================================== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      Biblical Literature Explorer
+      <span>Design System &amp; Specification v1.1</span>
+    </div>
+
+    <nav>
+      <div class="sidebar-nav-group">
+        <span class="sidebar-nav-group-title">Design System</span>
+        <a href="#ds-philosophy">Philosophy</a>
+        <a href="#ds-color">Color</a>
+        <a href="#ds-typography">Typography</a>
+        <a href="#ds-spacing">Spacing &amp; Layout</a>
+        <a href="#ds-motion">Motion</a>
+        <a href="#ds-components">Components</a>
+        <a href="#ds-voice">Voice &amp; Tone</a>
+      </div>
+      <div class="sidebar-nav-group">
+        <span class="sidebar-nav-group-title">Specification</span>
+        <a href="#spec-vision">Vision</a>
+        <a href="#spec-philosophy">Product Philosophy</a>
+        <a href="#spec-values">Product Values</a>
+        <a href="#spec-design">Design Philosophy</a>
+        <a href="#spec-language">Design Language</a>
+        <a href="#spec-emotion">Emotional Goals</a>
+        <a href="#spec-core">Core Experience</a>
+        <a href="#spec-progressive">Progressive Disclosure</a>
+        <a href="#spec-ia">Information Architecture</a>
+        <a href="#spec-navigation">Navigation &amp; Search</a>
+        <a href="#spec-passage">Passage Layout</a>
+        <a href="#spec-inspector">Inspector Panel</a>
+        <a href="#spec-cards">Discovery Cards</a>
+        <a href="#spec-graph">Knowledge Graph</a>
+        <a href="#spec-timeline">Timeline &amp; Maps</a>
+        <a href="#spec-workspace">Research Workspace</a>
+        <a href="#spec-motion">Motion Design</a>
+        <a href="#spec-device">Device Experience</a>
+        <a href="#spec-auth">Authentication</a>
+        <a href="#spec-stack">Technical Stack</a>
+        <a href="#spec-ai">AI Philosophy</a>
+        <a href="#spec-northstar">North Star</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ======================================================
+       MAIN CONTENT
+       ====================================================== -->
+  <main class="main">
+
+    <!-- HERO -->
+    <header class="hero" id="top">
+      <span class="badge">v1.1 &mdash; MVP</span>
+      <h1>Biblical Literature Explorer</h1>
+      <p class="lede">A comprehensive design system and product specification for the world's most transparent, evidence-based platform for exploring biblical literature.</p>
+    </header>
+
+    <hr>
+
+    <!-- ======================================================
+         DESIGN SYSTEM
+         ====================================================== -->
+
+    <!-- --- Philosophy --- -->
+    <section class="section" id="ds-philosophy">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Philosophy &amp; Principles</h2>
+      </div>
+      <p>The design system exists to serve one principle above all: <strong>clarity before decoration</strong>. Every token, every component, every interaction is evaluated against whether it helps a reader understand more or distracts from that goal.</p>
+
+      <ul class="principles">
+        <li>
+          <span class="principles-num">01</span>
+          <div>
+            <strong>Beauty through clarity</strong>
+            Elegance emerges from clear information hierarchy, generous whitespace, and purposeful typography — not ornamentation.
+          </div>
+        </li>
+        <li>
+          <span class="principles-num">02</span>
+          <div>
+            <strong>Calm as a feature</strong>
+            The interface never shouts. Colors are natural and warm. Motion is intentional. The reader always knows where they are and what to do next.
+          </div>
+        </li>
+        <li>
+          <span class="principles-num">03</span>
+          <div>
+            <strong>Simple first, deep on demand</strong>
+            Default states are clean. Complexity is revealed progressively as curiosity demands it.
+          </div>
+        </li>
+        <li>
+          <span class="principles-num">04</span>
+          <div>
+            <strong>Trustworthy by default</strong>
+            Every interactive element communicates confidence. Hover states are subtle but precise. Every claim is traceable to its source.
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- --- Color --- -->
+    <section class="section" id="ds-color">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Color</h2>
+      </div>
+      <p>A natural, warm, calm palette. No saturated colors. The palette evokes paper, earth, clay, and ink — materials that feel honest and permanent.</p>
+
+      <h3>Primary Palette</h3>
+      <div class="swatch-grid">
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#F7F3EE;">
+            <span class="badge" style="background:rgba(30,36,64,0.08);color:var(--color-deep-indigo);">Background</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Warm White</div>
+            <div class="swatch-hex">#F7F3EE</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#8B8178;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Borders</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Stone</div>
+            <div class="swatch-hex">#8B8178</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#3D3D3D;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Body Text</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Slate</div>
+            <div class="swatch-hex">#3D3D3D</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#7A8B6F;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Accent Alt</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Olive</div>
+            <div class="swatch-hex">#7A8B6F</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#C8664A;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Primary Accent</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Terracotta</div>
+            <div class="swatch-hex">#C8664A</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#D4C5B0;">
+            <span class="badge" style="background:rgba(30,36,64,0.1);color:var(--color-deep-indigo);">Surface Alt</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Sand</div>
+            <div class="swatch-hex">#D4C5B0</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#1E2440;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Headings</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Deep Indigo</div>
+            <div class="swatch-hex">#1E2440</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-preview" style="background:#B8735A;">
+            <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;">Accent 2</span>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-name">Muted Copper</div>
+            <div class="swatch-hex">#B8735A</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Semantic Mapping</h3>
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--bg-base</code></td><td><span class="token-preview" style="background:#F7F3EE;"></span>Warm White</td><td>Page background</td></tr>
+          <tr><td><code>--bg-surface</code></td><td><span class="token-preview" style="background:#FCFAF7;"></span>#FCFAF7</td><td>Sidebar, cards, elevated surfaces</td></tr>
+          <tr><td><code>--bg-card</code></td><td><span class="token-preview" style="background:#FFFFFF;"></span>White</td><td>Card, dropdown, modal backgrounds</td></tr>
+          <tr><td><code>--text-primary</code></td><td><span class="token-preview" style="background:#3D3D3D;"></span>Slate</td><td>Body text</td></tr>
+          <tr><td><code>--text-heading</code></td><td><span class="token-preview" style="background:#1E2440;"></span>Deep Indigo</td><td>Headings</td></tr>
+          <tr><td><code>--text-secondary</code></td><td><span class="token-preview" style="background:#6B6560;"></span>#6B6560</td><td>Supporting text, metadata</td></tr>
+          <tr><td><code>--accent</code></td><td><span class="token-preview" style="background:#C8664A;"></span>Terracotta</td><td>Links (hover), highlights, active states</td></tr>
+          <tr><td><code>--border-light</code></td><td><span class="token-preview" style="background:rgba(139,129,120,0.18);"></span>Stone @ 18%</td><td>Subtle dividers, card borders</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- --- Typography --- -->
+    <section class="section" id="ds-typography">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Typography</h2>
+      </div>
+      <p>The application should feel like reading a beautifully typeset book. We pair a refined serif for headings with a clean, readable sans-serif for body text.</p>
+
+      <h3>Font Families</h3>
+      <table class="token-table">
+        <thead>
+          <tr><th>Role</th><th>Family</th><th>Fallback</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Headings</strong></td><td><code>Literata</code></td><td>Georgia, Times New Roman, serif</td></tr>
+          <tr><td><strong>Body</strong></td><td><code>Inter</code></td><td>-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif</td></tr>
+          <tr><td><strong>Code</strong></td><td><code>SF Mono</code></td><td>Cascadia Code, Fira Code, monospace</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Type Scale</h3>
+      <div class="type-scale">
+        <div class="type-scale-item">
+          <div class="type-scale-label">Heading 1 &mdash; 3rem (48px)</div>
+          <h1 style="margin:0;">The Book of Genesis</h1>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Heading 2 &mdash; 1.875rem (30px)</div>
+          <h2 style="margin:0;">Historical Context</h2>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Heading 3 &mdash; 1.5rem (24px)</div>
+          <h3 style="margin:0;">The Patriarchal Period</h3>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Heading 4 &mdash; 1.25rem (20px)</div>
+          <h4 style="margin:0;">Abraham and the Covenant</h4>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Body &mdash; 1rem (16px)</div>
+          <p style="margin:0;max-width:100%;">In the beginning, God created the heavens and the earth. The earth was formless and void, and darkness was over the surface of the deep.</p>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Small &mdash; 0.875rem (14px)</div>
+          <p style="margin:0;max-width:100%;font-size:var(--text-sm);">Genesis 1:1 &mdash; English Standard Version</p>
+        </div>
+        <div class="type-scale-item">
+          <div class="type-scale-label">Extra Small &mdash; 0.75rem (12px)</div>
+          <p style="margin:0;max-width:100%;font-size:var(--text-xs);color:var(--text-muted);">12 occurrences &middot; 8 books &middot; Lexicon entry &rarr;</p>
+        </div>
+      </div>
+
+      <h3>Line Heights</h3>
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--leading-tight</code></td><td>1.15</td><td>Headings</td></tr>
+          <tr><td><code>--leading-snug</code></td><td>1.35</td><td>Small headings, nav items</td></tr>
+          <tr><td><code>--leading-normal</code></td><td>1.6</td><td>Body text</td></tr>
+          <tr><td><code>--leading-relaxed</code></td><td>1.75</td><td>Lede text, long-form reading</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- --- Spacing --- -->
+    <section class="section" id="ds-spacing">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Spacing &amp; Layout</h2>
+      </div>
+      <p>Generous whitespace is a core design value. The spacing scale follows a <strong>4px base</strong> with key values at 16, 24, 32, 48, 64, and 96 pixels.</p>
+
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Rem</th><th>Typical Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--space-1</code></td><td>4px</td><td>0.25rem</td><td>Tight icon gaps</td></tr>
+          <tr><td><code>--space-2</code></td><td>8px</td><td>0.5rem</td><td>Stacked badge spacing</td></tr>
+          <tr><td><code>--space-3</code></td><td>12px</td><td>0.75rem</td><td>Element padding</td></tr>
+          <tr><td><code>--space-4</code></td><td>16px</td><td>1rem</td><td>Card padding, section margin</td></tr>
+          <tr><td><code>--space-6</code></td><td>24px</td><td>1.5rem</td><td>Standard block margin, section padding</td></tr>
+          <tr><td><code>--space-8</code></td><td>32px</td><td>2rem</td><td>Section padding, page edge</td></tr>
+          <tr><td><code>--space-12</code></td><td>48px</td><td>3rem</td><td>Section gaps</td></tr>
+          <tr><td><code>--space-16</code></td><td>64px</td><td>4rem</td><td>Major section breaks</td></tr>
+          <tr><td><code>--space-24</code></td><td>96px</td><td>6rem</td><td>Page-level content margins</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Layout Constants</h3>
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--content-max</code></td><td>72rem (1152px)</td><td>Maximum page width for main content</td></tr>
+          <tr><td><code>--text-max</code></td><td>40rem (640px)</td><td>Optimal line length for readability</td></tr>
+          <tr><td><code>--sidebar-w</code></td><td>16rem (256px)</td><td>Fixed sidebar width on desktop</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Border Radius</h3>
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--radius-sm</code></td><td>4px</td><td>Inline code, small badges</td></tr>
+          <tr><td><code>--radius-md</code></td><td>8px</td><td>General cards, inputs</td></tr>
+          <tr><td><code>--radius-lg</code></td><td>12px</td><td>Feature cards, modals</td></tr>
+          <tr><td><code>--radius-xl</code></td><td>16px</td><td>Search bar, hero sections</td></tr>
+          <tr><td><code>--radius-full</code></td><td>9999px</td><td>Pills, badges, avatars</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- --- Motion --- -->
+    <section class="section" id="ds-motion">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Motion</h2>
+      </div>
+      <p>Animation is purposeful, never decorative. Every motion serves a functional purpose: orienting the user, showing a relationship, or providing confidence in an interaction.</p>
+
+      <table class="token-table">
+        <thead>
+          <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--dur-fast</code></td><td>150ms</td><td>Hovers, toggles, micro-interactions</td></tr>
+          <tr><td><code>--dur-normal</code></td><td>250ms</td><td>Panel slides, card expansion, transitions</td></tr>
+          <tr><td><code>--dur-slow</code></td><td>400ms</td><td>Page transitions, timeline zoom, graph layout</td></tr>
+          <tr><td><code>--ease-out</code></td><td><code>cubic-bezier(0.22, 1, 0.36, 1)</code></td><td>Elements entering or appearing</td></tr>
+          <tr><td><code>--ease-inout</code></td><td><code>cubic-bezier(0.65, 0, 0.35, 1)</code></td><td>Elements moving between states</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Motion Principles</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Fast by default</div>
+          <p>150ms for hovers and micro-interactions ensures the interface feels responsive, not sluggish.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Sliding, not fading</div>
+          <p>Elements that appear or dismiss slide from context (inspector from right, cards expanding upward). Fading alone disorients.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">No parallax, no fluff</div>
+          <p>Scroll-driven animations, parallax effects, and decorative transitions are explicitly excluded.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Graph animations are smooth</div>
+          <p>The knowledge graph uses force-directed layout transitions at 400ms with ease-out for natural-feeling reorganization.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Components --- -->
+    <section class="section" id="ds-components">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Components</h2>
+      </div>
+      <p>The following component tokens define the visual building blocks of the interface. These are the atomic and molecular elements that compose every screen.</p>
+
+      <h3>Cards</h3>
+      <p>Cards group related information. They use a white background, subtle border, and gentle hover elevation.</p>
+      <div class="card-grid">
+        <div class="card">
+          <span class="badge badge-neutral">Default</span>
+          <div class="card-title">Ancient Near Eastern Context</div>
+          <p>Explore the cultural, historical, and literary environment in which these texts were written.</p>
+        </div>
+        <div class="card" style="box-shadow:var(--shadow-md);">
+          <span class="badge badge-neutral">Hover</span>
+          <div class="card-title">Related Literature</div>
+          <p>Discover parallel texts, intertextual references, and comparative ancient literature.</p>
+        </div>
+      </div>
+
+      <h3>Inspector Panel</h3>
+      <p>A right-side panel that reveals details about selected entities without navigating away.</p>
+      <div class="component-demo" style="display:flex;justify-content:flex-end;">
+        <div class="component-demo-inspector">
+          <div class="inspector-header">
+            <strong>Elohim</strong>
+            <button class="inspector-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="inspector-section">
+            <strong>Meaning</strong>
+            <span>A generic Hebrew word for "god" or "God," used in the Hebrew Bible with both singular and plural reference.</span>
+          </div>
+          <div class="inspector-section">
+            <strong>Occurrences</strong>
+            <span>2,570 times in the Hebrew Bible</span>
+          </div>
+          <div class="inspector-section">
+            <strong>Related Concepts</strong>
+            <div>
+              <span class="inspector-tag">YHWH</span>
+              <span class="inspector-tag">El Shaddai</span>
+              <span class="inspector-tag">El Elyon</span>
+              <span class="inspector-tag">Divine Council</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Discovery Cards</h3>
+      <p>Inline cards that invite curiosity without interrupting the reading flow.</p>
+      <div class="card-grid">
+        <div class="discovery-card">
+          <div class="discovery-card-icon" style="background:rgba(200,102,74,0.1);">&#127758;</div>
+          <div class="discovery-card-body">
+            <h5>Ancient Near Eastern Context</h5>
+            <p>Explore the cultural and historical world behind the text.</p>
+          </div>
+        </div>
+        <div class="discovery-card">
+          <div class="discovery-card-icon" style="background:rgba(122,139,111,0.1);">&#128214;</div>
+          <div class="discovery-card-body">
+            <h5>Related Literature</h5>
+            <p>Parallel texts, intertextual references, and comparative works.</p>
+          </div>
+        </div>
+        <div class="discovery-card">
+          <div class="discovery-card-icon" style="background:rgba(30,36,64,0.1);">&#129518;</div>
+          <div class="discovery-card-body">
+            <h5>Interesting Question</h5>
+            <p>Why does the text use "Elohim" here instead of YHWH?</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Evidence Badge</h3>
+      <p>Every claim is traceable. Evidence badges indicate that a statement is backed by a source.</p>
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin:var(--space-4) 0;">
+        <span class="evidence-badge"><span class="evidence-dot"></span> 3 sources</span>
+        <span class="evidence-badge"><span class="evidence-dot"></span> Manuscript support</span>
+        <span class="evidence-badge"><span class="evidence-dot"></span> Scholarly consensus</span>
+      </div>
+
+      <h3>Knowledge Graph (Concept)</h3>
+      <div class="component-demo" style="display:flex;justify-content:center;">
+        <div class="graph-demo">
+          <div style="position:relative;display:flex;align-items:center;gap:0;">
+            <div class="graph-node people" style="margin-right:-20px;z-index:2;">Abraham</div>
+            <div class="graph-node central concepts" style="z-index:3;">Covenant</div>
+            <div class="graph-node people" style="margin-left:-20px;z-index:2;">Moses</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Navigation</h3>
+      <div class="nav-demo">
+        <a href="#" class="active">Home</a>
+        <a href="#">Explore</a>
+        <a href="#">Library</a>
+        <a href="#">Research</a>
+        <a href="#">Search</a>
+        <a href="#">Profile</a>
+      </div>
+    </section>
+
+    <!-- --- Voice & Tone --- -->
+    <section class="section" id="ds-voice">
+      <div class="section-header">
+        <span class="badge badge-neutral">Design Token</span>
+        <h2>Voice &amp; Tone</h2>
+      </div>
+      <p>The platform's voice is that of a <strong>knowledgeable librarian</strong> — precise, helpful, and never condescending. It explains without oversimplifying and cites without lecturing.</p>
+
+      <table class="token-table">
+        <thead>
+          <tr><th>Attribute</th><th>Approach</th><th>Avoid</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Clarity</strong></td><td>Plain language first; technical terms link to glossaries</td><td>Jargon without explanation</td></tr>
+          <tr><td><strong>Certainty</strong></td><td>Attribution is always present: "Scholars suggest…" "The manuscript evidence indicates…"</td><td>Absolute claims without evidence</td></tr>
+          <tr><td><strong>Tone</strong></td><td>Warm, inviting, intellectually humble</td><td>Preachy, dogmatic, or devotional language</td></tr>
+          <tr><td><strong>Complexity</strong></td><td>Simple first, deep on demand. Layers of detail available.</td><td>Information dumping on first view</td></tr>
+          <tr><td><strong>AI Voice</strong></td><td>"Based on the available sources…" — the AI is a guide, not an oracle</td><td>Presenting AI output as unqualified fact</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Microcopy Principles</h3>
+      <ul>
+        <li><strong>Buttons</strong> &mdash; Use verbs: "Explore connections", "View sources", "Compare manuscripts"</li>
+        <li><strong>Empty states</strong> &mdash; Never show a blank screen. "Start building your research workspace"</li>
+        <li><strong>Errors</strong> &mdash; "Something went wrong loading this passage. The connection to our manuscript database was interrupted."</li>
+        <li><strong>AI disclaimers</strong> &mdash; "AI responses are generated based on the sources in the knowledge graph. Always verify against primary evidence."</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- ======================================================
+         PRODUCT SPECIFICATION
+         ====================================================== -->
+
+    <section class="section" id="spec-vision">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Vision</h2>
+      </div>
+      <div class="card" style="background:var(--accent-subtle);border-color:var(--color-terracotta);">
+        <p style="font-family:var(--font-heading);font-size:var(--text-lg);max-width:100%;font-style:italic;margin:0;color:var(--text-heading);">
+          Build the world's most transparent, evidence-based platform for exploring biblical literature.
+        </p>
+      </div>
+      <p>This is not a Bible application. It is a research and reading platform where users discover the biblical world through evidence rather than doctrine.</p>
+      <p>The platform does not answer theological questions on behalf of the user. It provides:</p>
+      <div class="stack-grid">
+        <span class="stack-badge">Primary texts</span>
+        <span class="stack-badge">Historical context</span>
+        <span class="stack-badge">Linguistic evidence</span>
+        <span class="stack-badge">Literary relationships</span>
+        <span class="stack-badge">Manuscript witnesses</span>
+        <span class="stack-badge">Ancient Near Eastern parallels</span>
+        <span class="stack-badge">Scholarly perspectives</span>
+      </div>
+      <p><strong>Every conclusion traces back to its sources.</strong></p>
+    </section>
+
+    <!-- --- Product Philosophy --- -->
+    <section class="section" id="spec-philosophy">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Product Philosophy</h2>
+      </div>
+
+      <h3>Guiding Principle</h3>
+      <p style="font-family:var(--font-heading);font-size:var(--text-2xl);color:var(--text-heading);max-width:100%;margin-bottom:var(--space-4);">
+        Simple First. Deep on Demand.
+      </p>
+      <p>A first-time reader should never feel intimidated. A researcher should never feel limited. Complexity reveals itself only when curiosity demands it.</p>
+    </section>
+
+    <!-- --- Product Values --- -->
+    <section class="section" id="spec-values">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Product Values</h2>
+      </div>
+
+      <div class="value-grid">
+        <div class="value-item">
+          <div class="value-icon" style="background:rgba(200,102,74,0.1);color:var(--color-terracotta);">1</div>
+          <h5>Evidence before interpretation</h5>
+          <p>Primary sources precede commentary at every level.</p>
+        </div>
+        <div class="value-item">
+          <div class="value-icon" style="background:rgba(122,139,111,0.1);color:var(--color-olive);">2</div>
+          <h5>Primary sources before commentary</h5>
+          <p>The text speaks first. Interpretation follows.</p>
+        </div>
+        <div class="value-item">
+          <div class="value-icon" style="background:rgba(30,36,64,0.1);color:var(--color-deep-indigo);">3</div>
+          <h5>Transparency before certainty</h5>
+          <p>When evidence is ambiguous, we say so.</p>
+        </div>
+        <div class="value-item">
+          <div class="value-icon" style="background:rgba(184,115,90,0.1);color:var(--color-muted-copper);">4</div>
+          <h5>Curiosity before conclusions</h5>
+          <p>Questions are destinations. Answers are waypoints.</p>
+        </div>
+        <div class="value-item">
+          <div class="value-icon" style="background:rgba(212,197,176,0.3);color:var(--color-stone);">5</div>
+          <h5>Discovery before instruction</h5>
+          <p>The user explores. The platform illuminates.</p>
+        </div>
+      </div>
+
+      <h3>Operational Commitments</h3>
+      <ul>
+        <li><strong>Every claim is traceable</strong> &mdash; Any assertion about the text links back to its supporting evidence.</li>
+        <li><strong>AI explains; AI never invents</strong> &mdash; The AI assistant cites the knowledge graph and databases. It does not generate unsupported claims.</li>
+      </ul>
+    </section>
+
+    <!-- --- Design Philosophy --- -->
+    <section class="section" id="spec-design">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Design Philosophy</h2>
+      </div>
+      <p>The experience should feel like opening a beautiful digital library where knowledge is interconnected and exploration is effortless. The interface communicates:</p>
+      <div class="emotion-grid">
+        <div class="emotion-card"><h5>Calm</h5><p>Whitespace, muted colors, no visual noise.</p></div>
+        <div class="emotion-card"><h5>Curiosity</h5><p>Invitation at every turn, not instruction.</p></div>
+        <div class="emotion-card"><h5>Trust</h5><p>Evidence is visible. Claims are sourced.</p></div>
+        <div class="emotion-card"><h5>Depth</h5><p>Every element can be explored further.</p></div>
+        <div class="emotion-card"><h5>Focus</h5><p>Reading first. Everything else is contextual.</p></div>
+        <div class="emotion-card"><h5>Elegance</h5><p>Beauty emerges from clarity, not decoration.</p></div>
+      </div>
+
+      <h3>Design Inspirations</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Notion</div>
+          <p>Clean editorial layout, generous whitespace, block-based information architecture, calm typography, minimal visual noise. Users feel free to explore without overwhelm.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Obsidian</div>
+          <p>Knowledge graph visualization, connected notes, relationship-first navigation, backlinks, bidirectional thinking. The Bible feels like an interconnected network, not isolated books.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Linear</div>
+          <p>Polished interactions, crisp typography, fast navigation, subtle animations, premium feel, keyboard-first productivity. The application feels responsive and deliberate.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Perplexity</div>
+          <p>Question-driven exploration, evidence-backed answers, source attribution, clean reading experience, AI assisting rather than replacing. Users feel they are researching, not chatting.</p>
+        </div>
+        <div class="card" style="grid-column:1/-1;">
+          <div class="card-title">Google Maps &mdash; Primary Inspiration</div>
+          <p>Information reveals progressively with zoom depth. At first: roads. Then neighborhoods. Then buildings. Then businesses. The deeper the user explores, the richer the information becomes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Design Language --- -->
+    <section class="section" id="spec-language">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Design Language</h2>
+      </div>
+      <p>The interface should feel like a modern research notebook, not a religious application.</p>
+
+      <h3>What We Avoid</h3>
+      <div class="card-grid" style="margin-bottom:var(--space-6);">
+        <div class="card">
+          <div class="card-title" style="text-decoration:line-through;color:var(--text-muted);">Parchment textures</div>
+          <p>No artificial aging, no papyrus backgrounds, no "ancient scroll" aesthetic.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="text-decoration:line-through;color:var(--text-muted);">Medieval fonts</div>
+          <p>No blackletter, no uncial, no faux-historical typefaces.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="text-decoration:line-through;color:var(--text-muted);">Gold ornaments</div>
+          <p>No decorative borders, no illuminated initials, no ornamental flourishes.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="text-decoration:line-through;color:var(--text-muted);">Excessive religious symbolism</div>
+          <p>No crosses, no halos, no stained-glass filters, no iconographic shortcuts.</p>
+        </div>
+      </div>
+
+      <p><strong>Beauty comes from clarity.</strong></p>
+    </section>
+
+    <!-- --- Emotional Goals --- -->
+    <section class="section" id="spec-emotion">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Emotional Goals</h2>
+      </div>
+      <div class="card-grid">
+        <div class="card" style="background:rgba(122,139,111,0.06);border-color:var(--color-olive);">
+          <div class="card-title" style="color:var(--color-olive);">"I can understand this."</div>
+          <p>Clarity of language, structure, and navigation makes biblical scholarship feel accessible.</p>
+        </div>
+        <div class="card" style="background:rgba(200,102,74,0.06);border-color:var(--color-terracotta);">
+          <div class="card-title" style="color:var(--color-terracotta);">"I want to explore."</div>
+          <p>Every screen invites the next question. Discovery cards, connections, and cross-references create a web of curiosity.</p>
+        </div>
+        <div class="card" style="background:rgba(30,36,64,0.06);border-color:var(--color-deep-indigo);">
+          <div class="card-title" style="color:var(--color-deep-indigo);">"I wonder what connects here."</div>
+          <p>The knowledge graph, backlinks, and relationship trails make connections visible and navigable.</p>
+        </div>
+      </div>
+      <p style="color:var(--text-muted);font-style:italic;">Not: "I need theological training."</p>
+    </section>
+
+    <!-- --- Core Experience --- -->
+    <section class="section" id="spec-core">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Core Experience Principles</h2>
+      </div>
+      <blockquote>
+        Reading always comes first. Research always comes second.
+      </blockquote>
+      <p>Every page begins as a beautiful reading experience. Additional information appears only after interaction. This preserves immersion.</p>
+    </section>
+
+    <!-- --- Progressive Disclosure --- -->
+    <section class="section" id="spec-progressive">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Progressive Disclosure Framework</h2>
+      </div>
+      <p>Every passage page operates across four layers, each unlocking richer exploration:</p>
+
+      <div class="layer-stack">
+        <div class="layer-card layer-1">
+          <div class="layer-header">
+            <span class="layer-number">1</span>
+            <h4>Read</h4>
+          </div>
+          <div class="layer-body">
+            <p>Bible text, translation selector, reading controls, highlights, bookmarks, notes.</p>
+          </div>
+        </div>
+        <div class="layer-card layer-2">
+          <div class="layer-header">
+            <span class="layer-number">2</span>
+            <h4>Understand</h4>
+          </div>
+          <div class="layer-body">
+            <p>Historical background, timeline, people and places, short explanations, maps, cross-references. Plain language throughout.</p>
+          </div>
+        </div>
+        <div class="layer-card layer-3">
+          <div class="layer-header">
+            <span class="layer-number">3</span>
+            <h4>Explore</h4>
+          </div>
+          <div class="layer-body">
+            <p>Hebrew/Greek, lexicons, parallel passages, ancient literature, reception history, connections, interactive timelines.</p>
+          </div>
+        </div>
+        <div class="layer-card layer-4">
+          <div class="layer-header">
+            <span class="layer-number">4</span>
+            <h4>Research</h4>
+          </div>
+          <div class="layer-body">
+            <p>Textual criticism, scholarly debates, manuscript comparisons, source criticism, citation graph, academic references, variant readings.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Information Architecture --- -->
+    <section class="section" id="spec-ia">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Information Architecture</h2>
+      </div>
+
+      <h3>Homepage Prompt</h3>
+      <p style="font-family:var(--font-heading);font-size:var(--text-3xl);color:var(--text-heading);max-width:100%;margin-bottom:var(--space-6);">
+        "What would you like to explore today?"
+      </p>
+
+      <h3>Homepage Sections</h3>
+      <div class="stack-grid">
+        <span class="stack-badge">Continue Reading</span>
+        <span class="stack-badge">Today's Discovery</span>
+        <span class="stack-badge">Explore Topics</span>
+        <span class="stack-badge">Questions</span>
+        <span class="stack-badge">People</span>
+        <span class="stack-badge">Places</span>
+        <span class="stack-badge">Historical Timeline</span>
+        <span class="stack-badge">Maps</span>
+        <span class="stack-badge">Collections</span>
+        <span class="stack-badge">Research Workspace</span>
+        <span class="stack-badge">Recent Activity</span>
+      </div>
+    </section>
+
+    <!-- --- Navigation & Search --- -->
+    <section class="section" id="spec-navigation">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Navigation &amp; Search</h2>
+      </div>
+
+      <h3>Primary Navigation</h3>
+      <div class="nav-demo" style="margin-bottom:var(--space-6);">
+        <a href="#" class="active">Home</a>
+        <a href="#">Explore</a>
+        <a href="#">Library</a>
+        <a href="#">Research</a>
+        <a href="#">Search</a>
+        <a href="#">Profile</a>
+      </div>
+      <p>Secondary navigation appears contextually based on current content.</p>
+
+      <h3>Search Experience</h3>
+      <p>Modeled on Perplexity. Users type natural language queries:</p>
+      <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin:var(--space-4) 0;">
+        <span class="stack-badge">"Who are the Nephilim?"</span>
+        <span class="stack-badge">"What is Sheol?"</span>
+        <span class="stack-badge">"Melchizedek"</span>
+        <span class="stack-badge">"Psalm 82"</span>
+        <span class="stack-badge">"Temple"</span>
+        <span class="stack-badge">"David"</span>
+        <span class="stack-badge">"Babylon"</span>
+      </div>
+
+      <div class="component-demo">
+        <div class="search-demo">
+          <div class="search-demo-input">
+            <span>&#128269;</span>
+            <span style="color:var(--text-primary);">Who are the Nephilim?</span>
+            <span class="cursor"></span>
+          </div>
+          <div class="search-demo-results">
+            <a href="#">Summary &mdash; The Nephilim are beings mentioned in Genesis 6:1-4&hellip;</a>
+            <a href="#">Evidence &mdash; 3 manuscript traditions &middot; 2 interpretive frameworks</a>
+            <a href="#">Related texts &mdash; Numbers 13:33 &middot; Ezekiel 32:27 &middot; 1 Enoch</a>
+          </div>
+        </div>
+      </div>
+
+      <p>Results render as an <strong>exploration page</strong> containing: summary, evidence, related texts, timeline, people, maps, connections, and sources.</p>
+    </section>
+
+    <!-- --- Passage Layout --- -->
+    <section class="section" id="spec-passage">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Passage Layout</h2>
+      </div>
+      <p>Consistent structure for every passage:</p>
+      <div class="stack-grid" style="margin-bottom:var(--space-4);">
+        <span class="stack-badge">Reading Pane</span>
+        <span class="stack-badge">&rarr;</span>
+        <span class="stack-badge">Discovery Cards</span>
+        <span class="stack-badge">&rarr;</span>
+        <span class="stack-badge">Inspector Panel</span>
+        <span class="stack-badge">&rarr;</span>
+        <span class="stack-badge">Deep Research</span>
+      </div>
+
+      <div class="passage-demo">
+        <div class="passage-demo-main">
+          <div style="margin-bottom:var(--space-2);">
+            <span class="badge badge-neutral">Genesis 1:1-3 &middot; ESV</span>
+          </div>
+          <div class="verse">
+            <span class="verse-num">1</span>
+            In the beginning, <span class="word-highlight" title="Click to explore">God</span> created the heavens and the earth.
+          </div>
+          <div class="verse">
+            <span class="verse-num">2</span>
+            The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters.
+          </div>
+          <div class="verse">
+            <span class="verse-num">3</span>
+            And God said, <span class="word-highlight" title="Click to explore">"Let there be light"</span>, and there was light.
+          </div>
+        </div>
+        <div class="passage-demo-side">
+          <span class="badge badge-neutral">Context</span>
+          <h5>Discovery Cards</h5>
+          <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+            <div class="discovery-card" style="max-width:100%;">
+              <div class="discovery-card-icon" style="background:rgba(200,102,74,0.1);font-size:var(--text-sm);">&#127758;</div>
+              <div class="discovery-card-body">
+                <h5>Ancient Near Eastern Context</h5>
+                <p>Creation accounts in the ancient world.</p>
+              </div>
+            </div>
+            <div class="discovery-card" style="max-width:100%;">
+              <div class="discovery-card-icon" style="background:rgba(30,36,64,0.1);font-size:var(--text-sm);">&#128220;</div>
+              <div class="discovery-card-body">
+                <h5>Textual Notes</h5>
+                <p>Variant readings in Hebrew manuscripts.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Inspector Panel --- -->
+    <section class="section" id="spec-inspector">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Inspector Panel</h2>
+      </div>
+      <p>Details open in a right-side panel without navigating away. Selecting "Elohim" reveals meaning, occurrences, lexicon, timeline, related concepts, ancient parallels, and connections.</p>
+      <p><strong>Closing the panel immediately returns to reading. Flow is maintained.</strong></p>
+
+      <div class="component-demo" style="display:flex;justify-content:flex-end;">
+        <div class="component-demo-inspector">
+          <div class="inspector-header">
+            <strong>Elohim &mdash; &#1488;&#1461;&#1500;&#1465;&#1492;&#1460;&#1497;&#1501;</strong>
+            <button class="inspector-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="inspector-section">
+            <strong>Meaning</strong>
+            <span>A generic Hebrew word for "god" or "God," used with both singular and plural reference.</span>
+          </div>
+          <div class="inspector-section">
+            <strong>Occurrences</strong>
+            <span>2,570 times in the Hebrew Bible</span>
+          </div>
+          <div class="inspector-section">
+            <strong>Lexicon</strong>
+            <span>STEPBible &middot; Strong's H430 &middot; ETCBC</span>
+          </div>
+          <div class="inspector-section">
+            <strong>Related Concepts</strong>
+            <div>
+              <span class="inspector-tag">YHWH</span>
+              <span class="inspector-tag">El Shaddai</span>
+              <span class="inspector-tag">El Elyon</span>
+              <span class="inspector-tag">Divine Council</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Discovery Cards --- -->
+    <section class="section" id="spec-cards">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Discovery Cards</h2>
+      </div>
+      <p>Cards invite curiosity without interrupting reading:</p>
+      <div class="card-grid">
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(200,102,74,0.1);">&#127758;</div>
+          <div class="discovery-card-body">
+            <h5>Ancient Near Eastern Context</h5>
+            <p>Explore the cultural and historical matrix of the ancient world.</p>
+          </div>
+        </div>
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(122,139,111,0.1);">&#128214;</div>
+          <div class="discovery-card-body">
+            <h5>Related Literature</h5>
+            <p>Parallel texts, intertextual references, comparative works.</p>
+          </div>
+        </div>
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(30,36,64,0.1);">&#128101;</div>
+          <div class="discovery-card-body">
+            <h5>People Mentioned</h5>
+            <p>Individuals, groups, and genealogies referenced in the text.</p>
+          </div>
+        </div>
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(184,115,90,0.1);">&#127759;</div>
+          <div class="discovery-card-body">
+            <h5>Places</h5>
+            <p>Geographic locations, regions, and archaeological sites.</p>
+          </div>
+        </div>
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(212,197,176,0.3);">&#128218;</div>
+          <div class="discovery-card-body">
+            <h5>Quoted Elsewhere</h5>
+            <p>See where this passage is referenced in later texts.</p>
+          </div>
+        </div>
+        <div class="discovery-card" style="max-width:100%;">
+          <div class="discovery-card-icon" style="background:rgba(200,102,74,0.1);">&#129518;</div>
+          <div class="discovery-card-body">
+            <h5>Interesting Question</h5>
+            <p>Questions that arise naturally from the text.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Knowledge Graph --- -->
+    <section class="section" id="spec-graph">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Knowledge Graph</h2>
+      </div>
+      <p>Inspired by Obsidian. Every entity connects: People &middot; Books &middot; Events &middot; Languages &middot; Concepts &middot; Artifacts &middot; Kingdoms &middot; Places</p>
+      <p><strong>Users see knowledge expanding around them.</strong></p>
+      <div class="component-demo" style="display:flex;justify-content:center;">
+        <div class="graph-demo" style="flex-direction:column;gap:var(--space-4);">
+          <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;justify-content:center;">
+            <span class="graph-node people" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Abraham</span>
+            <span class="graph-node concepts" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Covenant</span>
+            <span class="graph-node events" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Exodus</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;justify-content:center;">
+            <span class="graph-node places" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Canaan</span>
+            <span class="graph-node people" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Moses</span>
+            <span class="graph-node concepts" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Torah</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap;justify-content:center;">
+            <span class="graph-node events" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Babylonian Exile</span>
+            <span class="graph-node people" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Isaiah</span>
+            <span class="graph-node places" style="width:auto;border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);">Jerusalem</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- Timeline & Maps --- -->
+    <section class="section" id="spec-timeline">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Timeline &amp; Maps</h2>
+      </div>
+
+      <h3>Timeline</h3>
+      <p>Horizontal, smooth, zoomable. Selecting 586 BC updates: Kings, Prophets, Empires, Relevant books, Major events, Artifacts.</p>
+      <div class="component-demo">
+        <div class="timeline-demo">
+          <div class="timeline-demo-item active" data-year="1000 BC"></div>
+          <div class="timeline-demo-item" data-year="922 BC"></div>
+          <div class="timeline-demo-item active" data-year="722 BC"></div>
+          <div class="timeline-demo-item" data-year="586 BC"></div>
+          <div class="timeline-demo-item" data-year="538 BC"></div>
+          <div class="timeline-demo-item" data-year="332 BC"></div>
+        </div>
+      </div>
+
+      <h3>Maps</h3>
+      <p>Inspired by Google Maps. Interactive, layered. Historical kingdoms, journeys, archaeology, trade routes, political borders, biblical events. Users move through geography as they move through ideas.</p>
+      <div class="map-demo">
+        <span class="map-demo-overlay">Interactive Map Layer &mdash; Kingdoms &middot; Routes &middot; Archaeology</span>
+      </div>
+    </section>
+
+    <!-- --- Research Workspace --- -->
+    <section class="section" id="spec-workspace">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Research Workspace</h2>
+      </div>
+      <p>Desktop becomes a multi-panel environment with resizable panels:</p>
+
+      <div class="workspace-demo">
+        <div class="workspace-panel" style="font-weight:500;color:var(--text-heading);">Reading</div>
+        <div class="workspace-panel">Timeline</div>
+        <div class="workspace-panel">Graph</div>
+        <div class="workspace-panel">Sources</div>
+        <div class="workspace-panel">Notes</div>
+        <div class="workspace-panel">Lexicon</div>
+        <div class="workspace-panel">Maps</div>
+        <div class="workspace-panel">Comparison</div>
+      </div>
+
+      <p>Additional panels: <span class="stack-badge">Sources</span> <span class="stack-badge">Notes</span> <span class="stack-badge">Lexicon</span> <span class="stack-badge">Maps</span> <span class="stack-badge">Comparison</span></p>
+    </section>
+
+    <!-- --- Visual Components --- -->
+    <section class="section" id="spec-visual">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Visual Components</h2>
+      </div>
+      <div class="card-grid">
+        <div class="card"><div class="card-title">Cards</div><p>Content containers with consistent padding, radius, and hover states.</p></div>
+        <div class="card"><div class="card-title">Inspector</div><p>Right-side contextual panel for entity details.</p></div>
+        <div class="card"><div class="card-title">Timeline</div><p>Horizontal, zoomable, interactive chronological view.</p></div>
+        <div class="card"><div class="card-title">Knowledge Graph</div><p>Force-directed graph of entity relationships.</p></div>
+        <div class="card"><div class="card-title">Evidence Badge</div><p>Visual indicator that a claim is sourced.</p></div>
+        <div class="card"><div class="card-title">Comparison Viewer</div><p>Side-by-side manuscript or translation comparison.</p></div>
+        <div class="card"><div class="card-title">Map Viewer</div><p>Interactive geographic exploration layer.</p></div>
+        <div class="card"><div class="card-title">Floating Preview</div><p>Hover-activated preview of linked entities.</p></div>
+        <div class="card"><div class="card-title">Command Palette</div><p>Keyboard-first shortcut for navigation and actions.</p></div>
+        <div class="card"><div class="card-title">Relationship Trail</div><p>Visual breadcrumb showing how entities connect.</p></div>
+        <div class="card"><div class="card-title">Citation Viewer</div><p>Structured academic reference display.</p></div>
+        <div class="card"><div class="card-title">Question Explorer</div><p>AI-generated follow-up questions based on current context.</p></div>
+      </div>
+    </section>
+
+    <!-- --- Motion Design --- -->
+    <section class="section" id="spec-motion">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Motion Design</h2>
+      </div>
+      <p>Animations are intentional, never decorative.</p>
+      <div class="card-grid">
+        <div class="card"><div class="card-title">Inspector</div><p>Slides naturally from the right edge at 250ms ease-out.</p></div>
+        <div class="card"><div class="card-title">Cards</div><p>Gently expand on interaction. No bounce, no scale overshoot.</p></div>
+        <div class="card"><div class="card-title">Timeline</div><p>Glides horizontally. Zoom transitions are smooth and continuous.</p></div>
+        <div class="card"><div class="card-title">Graph</div><p>Force-directed layout animates at 400ms. Nodes settle naturally.</p></div>
+        <div class="card"><div class="card-title">Hover</div><p>Subtle shadow elevation, no scale transforms on cards.</p></div>
+      </div>
+      <p>Everything feels alive without distraction.</p>
+    </section>
+
+    <!-- --- Device Experience --- -->
+    <section class="section" id="spec-device">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Device Experience</h2>
+      </div>
+      <div class="card-grid">
+        <div class="card" style="background:rgba(200,102,74,0.04);border-color:var(--color-terracotta);">
+          <div class="card-title">Mobile &mdash; Reading Companion</div>
+          <p>Optimized for single-hand reading. Simplified navigation, swipe gestures, bottom-sheet inspector. Focus on layers 1 and 2 (Read, Understand).</p>
+        </div>
+        <div class="card" style="background:rgba(30,36,64,0.04);border-color:var(--color-deep-indigo);">
+          <div class="card-title">Desktop &mdash; Research Studio</div>
+          <p>Multi-panel workspace. Full keyboard navigation. Sidebar, inspector, timeline, graph — all available simultaneously. All four layers accessible.</p>
+        </div>
+      </div>
+      <p>Both feel native to their device.</p>
+    </section>
+
+    <!-- --- Authentication --- -->
+    <section class="section" id="spec-auth">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Authentication</h2>
+      </div>
+      <p>Users authenticate via social login providers to minimize friction:</p>
+      <div class="stack-grid" style="margin-bottom:var(--space-4);">
+        <span class="stack-badge">Google</span>
+        <span class="stack-badge">Apple</span>
+        <span class="stack-badge badge-neutral" style="font-style:italic;">Future: GitHub, Microsoft</span>
+      </div>
+      <p>No email-password registration. Onboarding should be instant. User preferences, highlights, bookmarks, and research workspaces sync across devices upon sign-in.</p>
+    </section>
+
+    <!-- --- Technical Stack --- -->
+    <section class="section" id="spec-stack">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>Technical Stack</h2>
+      </div>
+
+      <div class="stack-group">
+        <div class="stack-group-title">Frontend</div>
+        <div class="stack-grid">
+          <span class="stack-badge">Next.js (App Router)</span>
+          <span class="stack-badge">TypeScript</span>
+          <span class="stack-badge">Tailwind CSS</span>
+          <span class="stack-badge">shadcn/ui</span>
+          <span class="stack-badge">Radix UI</span>
+          <span class="stack-badge">Framer Motion</span>
+          <span class="stack-badge">TanStack Query</span>
+          <span class="stack-badge">TipTap</span>
+          <span class="stack-badge">React Flow</span>
+          <span class="stack-badge">Leaflet / MapLibre</span>
+        </div>
+      </div>
+
+      <div class="stack-group">
+        <div class="stack-group-title">Backend</div>
+        <div class="stack-grid">
+          <span class="stack-badge">NestJS</span>
+          <span class="stack-badge">Node.js</span>
+        </div>
+      </div>
+
+      <div class="stack-group">
+        <div class="stack-group-title">Databases</div>
+        <div class="stack-grid">
+          <span class="stack-badge">MongoDB</span>
+          <span class="stack-badge">Neo4j</span>
+          <span class="stack-badge">OpenSearch</span>
+          <span class="stack-badge">Redis</span>
+          <span class="stack-badge">MinIO</span>
+        </div>
+      </div>
+
+      <div class="stack-group">
+        <div class="stack-group-title">Authentication</div>
+        <div class="stack-grid">
+          <span class="stack-badge">NextAuth.js (Auth.js)</span>
+          <span class="stack-badge">Google Provider</span>
+          <span class="stack-badge">Apple Provider</span>
+        </div>
+      </div>
+
+      <div class="stack-group">
+        <div class="stack-group-title">Infrastructure</div>
+        <div class="stack-grid">
+          <span class="stack-badge">Docker</span>
+          <span class="stack-badge">Kubernetes</span>
+          <span class="stack-badge">Nginx</span>
+          <span class="stack-badge">GitHub Actions</span>
+          <span class="stack-badge">Prometheus</span>
+          <span class="stack-badge">Grafana</span>
+          <span class="stack-badge">Loki</span>
+        </div>
+      </div>
+
+      <p style="margin-top:var(--space-4);color:var(--text-secondary);">
+        <em>Note:</em> The frontend tooling (Tailwind, shadcn/ui) will compose using the CSS custom properties defined in this design system. All components should reference design tokens, not hardcoded values.
+      </p>
+    </section>
+
+    <!-- --- AI Philosophy --- -->
+    <section class="section" id="spec-ai">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>AI Philosophy</h2>
+      </div>
+      <blockquote>
+        AI is never the source of truth.
+      </blockquote>
+      <p>The knowledge graph is. The databases are. The manuscripts are.</p>
+      <p>AI is an intelligent librarian that:</p>
+      <div class="card-grid">
+        <div class="card"><div class="card-title">Explains</div><p>Complex concepts in plain language with source links.</p></div>
+        <div class="card"><div class="card-title">Compares</div><p>Side-by-side analysis of manuscripts, translations, or interpretations.</p></div>
+        <div class="card"><div class="card-title">Summarizes</div><p>Scholarly consensus and areas of debate.</p></div>
+        <div class="card"><div class="card-title">Translates Complexity</div><p>Hebrew/Greek grammar, textual criticism, historical context.</p></div>
+        <div class="card"><div class="card-title">Guides Exploration</div><p>Suggests connections, questions, and next steps.</p></div>
+      </div>
+      <p><strong>Every AI response cites the evidence used to generate it.</strong></p>
+    </section>
+
+    <!-- --- North Star --- -->
+    <section class="section" id="spec-northstar">
+      <div class="section-header">
+        <span class="badge badge-olive">Specification</span>
+        <h2>North Star</h2>
+      </div>
+      <div class="card" style="background:var(--accent-subtle);border-color:var(--color-terracotta);padding:var(--space-8);">
+        <p style="font-family:var(--font-heading);font-size:var(--text-xl);max-width:100%;font-style:italic;margin:0;color:var(--text-heading);line-height:var(--leading-relaxed);">
+          Biblical Literature Explorer should feel like opening a beautifully designed research notebook where every page invites curiosity, every claim is traceable, every connection is visible, and every reader&mdash;from beginner to scholar&mdash;can confidently explore the world of biblical literature at their own pace.
+        </p>
+      </div>
+    </section>
+
+    <hr>
+
+    <footer style="padding:var(--space-8) 0;text-align:center;color:var(--text-muted);font-size:var(--text-sm);">
+      <p style="margin:0 auto;max-width:100%;">
+        Biblical Literature Explorer &mdash; Design System &amp; Product Specification v1.1 &mdash; MVP
+      </p>
+      <p style="margin:var(--space-2) 0 0;max-width:100%;">
+        Built on the principle that every reader deserves access to evidence, context, and clarity.
+      </p>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>

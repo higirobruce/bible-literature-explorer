@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wireframes — Biblical Literature Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap" rel="stylesheet" />
+<style>
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  color: #1a1a1a;
+  background: #f5f5f5;
+}
+
+/* --- Wireframe chrome --- */
+.wf-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; gap: 6px;
+  height: 48px; padding: 0 20px;
+  background: #222; color: #ccc;
+  font-size: 13px; font-weight: 500;
+  overflow-x: auto;
+}
+.wf-bar .wf-label {
+  color: #888; font-weight: 400; margin-right: 8px;
+  white-space: nowrap;
+}
+.wf-bar button {
+  padding: 6px 14px; border: 1px solid #444; border-radius: 6px;
+  background: #333; color: #ccc; font-size: 12px; cursor: pointer;
+  white-space: nowrap; transition: 0.15s;
+}
+.wf-bar button:hover { background: #444; color: #fff; }
+.wf-bar button.active { background: #555; color: #fff; border-color: #888; }
+
+/* --- Screen container --- */
+.screen { display: none; padding-top: 48px; }
+.screen.active { display: block; }
+
+/* --- Headings in Literata --- */
+.wf-h1, .wf-h2, .wf-h3, .wf-h4, .inspector-title, .disc-card-body .title, .ws-label, .logo, .wf-block-title, .nav-wire .logo {
+  font-family: 'Literata', Georgia, 'Times New Roman', serif;
+}
+
+/* --- Wireframe elements --- */
+.wf-page {
+  max-width: 1200px; margin: 0 auto; padding: 24px 32px 64px;
+}
+.wf-tag {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 4px;
+  background: #e8e8e8; color: #888; margin-bottom: 8px;
+}
+.wf-block {
+  background: #fff; border: 1px solid #ddd; border-radius: 8px;
+  padding: 16px;
+}
+.wf-block-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.03em; color: #999; margin-bottom: 8px;
+}
+.wf-h1 { font-size: 28px; font-weight: 600; color: #111; margin-bottom: 4px; }
+.wf-h2 { font-size: 20px; font-weight: 600; color: #111; margin-bottom: 4px; }
+.wf-h3 { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 3px; }
+.wf-p { font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 8px; }
+.wf-p-small { font-size: 12px; color: #999; line-height: 1.4; }
+
+.wf-chip {
+  display: inline-block; font-size: 12px; padding: 2px 10px;
+  background: #f0f0f0; border-radius: 12px; color: #666;
+}
+.wf-divider {
+  height: 1px; background: #e0e0e0; margin: 24px 0;
+}
+
+/* --- Layout helpers --- */
+.wf-row { display: flex; gap: 16px; }
+.wf-col { flex: 1; }
+.wf-grid {
+  display: grid; gap: 12px;
+}
+.wf-grid-2 { grid-template-columns: 1fr 1fr; }
+.wf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.wf-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* --- Faux text --- */
+.wf-line { height: 12px; background: #eee; border-radius: 4px; margin-bottom: 6px; }
+.wf-line-thin { height: 8px; background: #f0f0f0; border-radius: 3px; margin-bottom: 4px; }
+.wf-line.w50 { width: 50%; }
+.wf-line.w70 { width: 70%; }
+.wf-line.w80 { width: 80%; }
+.wf-line.w60 { width: 60%; }
+.wf-line.w40 { width: 40%; }
+.wf-line.w30 { width: 30%; }
+.wf-line.w90 { width: 90%; }
+
+/* --- Box placeholders --- */
+.wf-box {
+  background: #f0f0f0; border: 1px dashed #ccc; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #aaa; font-size: 12px; text-align: center;
+}
+.wf-box-h64 { height: 64px; }
+.wf-box-h48 { height: 48px; }
+.wf-box-h100 { height: 100px; }
+.wf-box-h200 { height: 200px; }
+.wf-box-h150 { height: 150px; }
+.wf-box-h300 { height: 300px; }
+.wf-box-h400 { height: 400px; }
+
+/* --- Homepage sections --- */
+.home-hero {
+  text-align: center; padding: 60px 0 40px;
+}
+.home-hero .wf-h1 { font-size: 32px; }
+.home-hero .wf-p { max-width: 500px; margin: 8px auto 0; }
+.home-search-row {
+  max-width: 560px; margin: 20px auto 0;
+  display: flex; gap: 0;
+}
+.home-search-row input {
+  flex: 1; padding: 12px 16px; border: 1px solid #ccc;
+  border-right: none; border-radius: 8px 0 0 8px; font-size: 14px;
+  outline: none;
+}
+.home-search-row button {
+  padding: 12px 24px; border: 1px solid #ccc; border-radius: 0 8px 8px 0;
+  background: #222; color: #fff; font-size: 14px; cursor: pointer;
+}
+
+.home-section-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: #999; margin: 32px 0 12px;
+}
+
+/* === SIDEBAR LAYOUT (used in passage views) === */
+.passage-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Passage text */
+.verse-row {
+  display: flex; gap: 8px; margin-bottom: 4px;
+  font-size: 15px; line-height: 1.6;
+}
+.verse-num {
+  font-size: 11px; color: #bbb; font-weight: 600;
+  min-width: 20px; text-align: right; margin-top: 2px;
+}
+.verse-text { flex: 1; }
+.word-link {
+  color: #c8664a; cursor: pointer;
+  border-bottom: 1px dashed #ccc;
+  transition: 0.15s;
+}
+.word-link:hover { background: #fdf0eb; }
+
+/* --- Translation bar --- */
+.translation-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0 16px; border-bottom: 1px solid #eee; margin-bottom: 20px;
+}
+.translation-bar select {
+  font-size: 13px; padding: 6px 12px; border: 1px solid #ddd;
+  border-radius: 6px; background: #fff;
+}
+.translation-bar .wf-chip { font-size: 11px; }
+
+/* --- Inspector panel (wireframe) --- */
+.inspector {
+  background: #fff; border: 1px solid #ddd; border-radius: 8px;
+  padding: 20px;
+}
+.inspector-title {
+  font-size: 18px; font-weight: 600; margin-bottom: 4px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.inspector-title .close {
+  font-size: 18px; color: #ccc; cursor: pointer; background: none; border: none;
+}
+.inspector-subtitle {
+  font-size: 13px; color: #999; margin-bottom: 16px;
+}
+.inspector-section {
+  margin-bottom: 14px;
+}
+.inspector-section-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #bbb; margin-bottom: 4px;
+}
+.inspector-section-value {
+  font-size: 13px; color: #333; line-height: 1.4;
+}
+.inspector-chips {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
+}
+.inspector-chips span {
+  font-size: 11px; padding: 3px 8px; background: #f0f0f0;
+  border-radius: 4px; color: #555;
+}
+
+/* --- Discovery card --- */
+.disc-card {
+  display: flex; gap: 10px; padding: 12px;
+  background: #fff; border: 1px solid #eee; border-radius: 8px;
+  cursor: pointer; transition: 0.15s;
+}
+.disc-card:hover { border-color: #ccc; background: #fafafa; }
+.disc-card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: #f5f5f5; display: flex; align-items: center;
+  justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.disc-card-body { flex: 1; }
+.disc-card-body .title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.disc-card-body .desc { font-size: 11px; color: #999; }
+
+/* --- Knowledge graph placeholder --- */
+.graph-placeholder {
+  position: relative; height: 300px; background: #fafafa;
+  border: 1px solid #eee; border-radius: 8px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.graph-dot {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%;
+  background: #d0d0d0;
+}
+.graph-line {
+  position: absolute; height: 1px; background: #ddd;
+  transform-origin: 0 0;
+}
+.graph-label {
+  position: absolute; font-size: 10px; color: #888;
+  transform: translate(-50%, -50%);
+}
+
+/* --- Workspace panels --- */
+.ws-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px; height: 500px;
+}
+.ws-panel {
+  background: #fff; border: 1px solid #ddd; border-radius: 8px;
+  padding: 12px; display: flex; flex-direction: column;
+}
+.ws-panel .ws-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  color: #bbb; letter-spacing: 0.03em;
+  margin-bottom: 8px; flex-shrink: 0;
+}
+.ws-panel .ws-content { flex: 1; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 12px; }
+.ws-panel.main { grid-row: 1 / 3; }
+
+/* --- Map placeholder --- */
+.map-wire {
+  height: 200px; background: #f0efe8;
+  border: 1px solid #ddd; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #bbb; font-size: 13px;
+}
+
+/* --- Timeline wire --- */
+.timeline-wire {
+  display: flex; align-items: center; gap: 4px;
+  padding: 16px 0; overflow-x: auto;
+}
+.tl-event {
+  flex-shrink: 0; width: 120px; text-align: center;
+}
+.tl-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #ddd; margin: 0 auto 4px;
+}
+.tl-dot.active { background: #c8664a; width: 12px; height: 12px; }
+.tl-year { font-size: 11px; color: #999; }
+.tl-label { font-size: 11px; color: #555; }
+
+/* --- Section label --- */
+.section-title {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #bbb; margin: 24px 0 8px;
+}
+
+/* --- Layers wireframe --- */
+.layer-row {
+  display: flex; gap: 8px; margin-bottom: 8px;
+}
+.layer-pill {
+  flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px;
+  text-align: center; font-size: 13px; font-weight: 500; color: #888;
+  background: #fff; cursor: pointer; transition: 0.15s;
+}
+.layer-pill:hover { border-color: #bbb; background: #fafafa; }
+.layer-pill.active {
+  border-color: #c8664a; color: #c8664a; background: #fdf0eb;
+}
+.layer-pill .layer-num {
+  font-size: 22px; font-weight: 700; display: block; margin-bottom: 2px;
+}
+
+/* --- Questions / search results --- */
+.q-result {
+  padding: 14px; border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+.q-result:last-child { border-bottom: none; }
+.q-result:hover { background: #fafafa; }
+.q-result .q-type {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: #bbb; margin-bottom: 2px;
+}
+.q-result .q-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.q-result .q-snippet {
+  font-size: 12px; color: #888; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* --- Profile / auth row --- */
+.auth-row {
+  display: flex; align-items: center; gap: 12px;
+  justify-content: flex-end; padding: 8px 0;
+}
+.auth-btn {
+  padding: 6px 16px; border: 1px solid #ddd; border-radius: 6px;
+  font-size: 12px; background: #fff; cursor: pointer;
+}
+.auth-btn.primary { background: #222; color: #fff; border-color: #222; }
+
+/* --- Nav bar wire --- */
+.nav-wire {
+  display: flex; align-items: center; gap: 20px;
+  padding: 12px 0; border-bottom: 1px solid #eee;
+}
+.nav-wire a {
+  font-size: 13px; color: #888; text-decoration: none; padding-bottom: 2px;
+}
+.nav-wire a.active { color: #111; font-weight: 500; border-bottom: 2px solid #c8664a; }
+.nav-wire .logo {
+  font-size: 16px; font-weight: 600; color: #111; margin-right: auto;
+}
+
+/* --- Responsive --- */
+@media (max-width: 800px) {
+  .passage-layout { grid-template-columns: 1fr; }
+  .wf-grid-3 { grid-template-columns: 1fr; }
+  .ws-grid { grid-template-columns: 1fr; height: auto; }
+  .ws-panel.main { grid-row: auto; }
+  .wf-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV BAR (wireframe switcher)
+     ============================================================ -->
+<div class="wf-bar">
+  <span class="wf-label">Wireframes:</span>
+  <button class="active" data-screen="home">Homepage</button>
+  <button data-screen="passage">Passage: Read</button>
+  <button data-screen="inspector">Passage + Inspector</button>
+  <button data-screen="graph">Knowledge Graph</button>
+  <button data-screen="search">Search Results</button>
+  <button data-screen="workspace">Research Workspace</button>
+  <button data-screen="timeline">Timeline</button>
+  <button data-screen="mobile">Mobile View</button>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: HOMEPAGE
+     ============================================================ -->
+<div class="screen active" id="screen-home">
+  <div class="wf-page">
+
+    <!-- Nav -->
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#" class="active">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+      <div class="auth-row" style="padding:0;">
+        <button class="auth-btn primary">Sign in</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="home-hero">
+      <div class="wf-tag" style="margin-bottom:12px;">Biblical Literature Explorer</div>
+      <div class="wf-h1">What would you like to explore today?</div>
+      <div class="wf-p">Ask a question, search a passage, or browse a topic.</div>
+      <div class="home-search-row">
+        <input type="text" placeholder='e.g. "Who are the Nephilim?" or "Genesis 1" or "Sheol"' />
+        <button>Search</button>
+      </div>
+    </div>
+
+    <!-- Quick topics -->
+    <div class="wf-row" style="gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:40px;">
+      <span class="wf-chip" style="cursor:pointer;">People</span>
+      <span class="wf-chip" style="cursor:pointer;">Places</span>
+      <span class="wf-chip" style="cursor:pointer;">Timeline</span>
+      <span class="wf-chip" style="cursor:pointer;">Maps</span>
+      <span class="wf-chip" style="cursor:pointer;">Texts</span>
+      <span class="wf-chip" style="cursor:pointer;">Concepts</span>
+      <span class="wf-chip" style="cursor:pointer;">Manuscripts</span>
+    </div>
+
+    <!-- Content grid -->
+    <div class="wf-grid wf-grid-4">
+      <div class="wf-block">
+        <div class="wf-block-title">Continue Reading</div>
+        <div class="wf-line w80"></div>
+        <div class="wf-line-thin w50"></div>
+        <div style="margin-top:12px;">
+          <div class="wf-line w90"></div>
+          <div class="wf-line w60"></div>
+        </div>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Today's Discovery</div>
+        <div class="wf-box wf-box-h64" style="margin-bottom:8px;">Enuma Elish &amp; Genesis</div>
+        <div class="wf-line w80"></div>
+        <div class="wf-line-thin w50"></div>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Explore Topics</div>
+        <span class="wf-chip">Covenant</span>
+        <span class="wf-chip">Divine Council</span>
+        <span class="wf-chip">Apocalyptic</span>
+        <span class="wf-chip">Wisdom</span>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Questions</div>
+        <div class="wf-line w90"></div>
+        <div class="wf-line-thin w70"></div>
+        <div class="wf-line w80" style="margin-top:8px;"></div>
+        <div class="wf-line-thin w40"></div>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">People</div>
+        <span class="wf-chip">Abraham</span>
+        <span class="wf-chip">Moses</span>
+        <span class="wf-chip">David</span>
+        <span class="wf-chip">Isaiah</span>
+        <span class="wf-chip">Paul</span>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Places</div>
+        <span class="wf-chip">Jerusalem</span>
+        <span class="wf-chip">Babylon</span>
+        <span class="wf-chip">Egypt</span>
+        <span class="wf-chip">Nineveh</span>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Historical Timeline</div>
+        <div class="wf-box wf-box-h48" style="margin-bottom:4px;">&larr; 1000 BC &mdash; 586 BC &mdash; 538 BC &rarr;</div>
+        <div class="wf-line-thin w60"></div>
+      </div>
+      <div class="wf-block">
+        <div class="wf-block-title">Maps</div>
+        <div class="wf-box wf-box-h64">Fertile Crescent</div>
+      </div>
+    </div>
+
+    <!-- Activity row -->
+    <div class="section-title">Recent Activity</div>
+    <div class="wf-row">
+      <div class="wf-block" style="flex:1;">
+        <div class="wf-block-title">Research Workspace</div>
+        <div style="display:flex;gap:8px;">
+          <div class="wf-box wf-box-h48" style="flex:1;">Notes: Genesis 1-11</div>
+          <div class="wf-box wf-box-h48" style="flex:1;">Comparison: 4 Gospels</div>
+        </div>
+      </div>
+      <div class="wf-block" style="flex:1;">
+        <div class="wf-block-title">Collections</div>
+        <span class="wf-chip">Messianic Prophecies</span>
+        <span class="wf-chip">Exodus Motif</span>
+        <span class="wf-chip">Wisdom Psalms</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: PASSAGE VIEW (Layer 1 — Read)
+     ============================================================ -->
+<div class="screen" id="screen-passage">
+  <div class="wf-page">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+      <div class="auth-row" style="padding:0;">
+        <span class="wf-chip" style="font-size:11px;margin:0;">Bruce H.</span>
+      </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div style="font-size:12px;color:#999;margin:12px 0;">
+      Home &rsaquo; Library &rsaquo; Old Testament &rsaquo; Genesis &rsaquo; <strong>Chapter 1</strong>
+    </div>
+
+    <!-- Translation bar + Layer pills -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div class="translation-bar" style="border:none;margin:0;padding:0;">
+        <select><option>English Standard Version</option><option>NIV</option><option>NASB</option><option>KJV</option><option>NRSV</option></select>
+        <span class="wf-chip">Hebrew</span>
+        <span class="wf-chip">Greek (LXX)</span>
+      </div>
+      <div class="layer-row" style="margin:0;">
+        <div class="layer-pill active" style="flex:none;padding:8px 16px;">
+          <span class="layer-num" style="font-size:16px;display:inline;margin:0;">1</span> Read
+        </div>
+        <div class="layer-pill" style="flex:none;padding:8px 16px;">
+          <span class="layer-num" style="font-size:16px;display:inline;margin:0;">2</span> Understand
+        </div>
+        <div class="layer-pill" style="flex:none;padding:8px 16px;">
+          <span class="layer-num" style="font-size:16px;display:inline;margin:0;">3</span> Explore
+        </div>
+        <div class="layer-pill" style="flex:none;padding:8px 16px;">
+          <span class="layer-num" style="font-size:16px;display:inline;margin:0;">4</span> Research
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-divider"></div>
+
+    <!-- Passage layout -->
+    <div class="passage-layout">
+      <!-- Left: Reading pane -->
+      <div>
+        <div class="wf-h2" style="font-size:22px;">Genesis 1</div>
+        <div class="wf-p-small" style="margin-bottom:16px;">The Creation Account</div>
+
+        <div class="verse-row">
+          <span class="verse-num">1</span>
+          <span class="verse-text">In the beginning, <span class="word-link" title="Click to explore">God</span> created the heavens and the earth.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">2</span>
+          <span class="verse-text">The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">3</span>
+          <span class="verse-text">And God said, <span class="word-link" title="Click to explore">"Let there be light"</span>, and there was light.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">4</span>
+          <span class="verse-text">And God saw that the light was good. And God separated the light from the darkness.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">5</span>
+          <span class="verse-text">God called the light Day, and the darkness he called Night. And there was evening and there was morning, the first day.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">6</span>
+          <span class="verse-text">And God said, <span class="word-link">"Let there be an expanse"</span> in the midst of the waters, and let it separate the waters from the waters.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">7</span>
+          <span class="verse-text">And God made the expanse and separated the waters that were under the expanse from the waters that were above the expanse. And it was so.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">8</span>
+          <span class="verse-text">And God called the expanse Heaven. And there was evening and there was morning, the second day.</span>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:12px;">
+          <span class="wf-chip" style="cursor:pointer;">&larr; Previous chapter</span>
+          <span class="wf-chip" style="cursor:pointer;">Next chapter &rarr;</span>
+        </div>
+
+        <!-- Inline discovery cards -->
+        <div class="section-title" style="margin-top:32px;">Discovery</div>
+        <div class="wf-grid wf-grid-3" style="margin-bottom:16px;">
+          <div class="disc-card">
+            <div class="disc-card-icon">&#127758;</div>
+            <div class="disc-card-body">
+              <div class="title">Ancient Near Eastern Context</div>
+              <div class="desc">Creation accounts in Mesopotamia and Egypt</div>
+            </div>
+          </div>
+          <div class="disc-card">
+            <div class="disc-card-icon">&#128214;</div>
+            <div class="disc-card-body">
+              <div class="title">Related Literature</div>
+              <div class="desc">Enuma Elish, Atrahasis, Pyramid Texts</div>
+            </div>
+          </div>
+          <div class="disc-card">
+            <div class="disc-card-icon">&#129518;</div>
+            <div class="disc-card-body">
+              <div class="title">Interesting Question</div>
+              <div class="desc">Why are there two creation accounts?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Sidebar (empty, contextual) -->
+      <div>
+        <div class="wf-block" style="margin-bottom:12px;">
+          <div class="wf-block-title">Chapter Overview</div>
+          <div class="wf-line w90"></div>
+          <div class="wf-line w70"></div>
+          <div class="wf-line w80"></div>
+          <div class="wf-line-thin w50" style="margin-bottom:8px;"></div>
+          <span class="wf-chip">7 days</span>
+          <span class="wf-chip">Creation</span>
+          <span class="wf-chip">Elohim</span>
+        </div>
+        <div class="wf-block" style="margin-bottom:12px;">
+          <div class="wf-block-title">People &amp; Places</div>
+          <div class="wf-line w60"></div>
+          <div class="wf-line-thin w40"></div>
+          <div style="margin-top:8px;">
+            <span class="wf-chip">God (Elohim)</span>
+            <span class="wf-chip">Garden of Eden</span>
+          </div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-title">Cross-References</div>
+          <div class="wf-line w90"></div>
+          <div class="wf-line w80"></div>
+          <div class="wf-line w60"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: PASSAGE + INSPECTOR PANEL
+     ============================================================ -->
+<div class="screen" id="screen-inspector">
+  <div class="wf-page">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+      <div class="auth-row" style="padding:0;">
+        <span class="wf-chip" style="font-size:11px;margin:0;">Bruce H.</span>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:#999;margin:12px 0;">
+      Home &rsaquo; Library &rsaquo; Old Testament &rsaquo; Genesis &rsaquo; Chapter 1
+    </div>
+
+    <div class="passage-layout">
+      <!-- Left: Passage -->
+      <div>
+        <div class="wf-h2" style="font-size:22px;">Genesis 1</div>
+        <div class="verse-row">
+          <span class="verse-num">1</span>
+          <span class="verse-text">In the beginning, <span class="word-link" style="background:#fdf0eb;border-color:#c8664a;">God</span> created the heavens and the earth.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">2</span>
+          <span class="verse-text">The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">3</span>
+          <span class="verse-text">And God said, <span class="word-link">"Let there be light"</span>, and there was light.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">4</span>
+          <span class="verse-text">And God saw that the light was good. And God separated the light from the darkness.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">5</span>
+          <span class="verse-text">God called the light Day, and the darkness he called Night. And there was evening and there was morning, the first day.</span>
+        </div>
+        <div class="verse-row">
+          <span class="verse-num">6</span>
+          <span class="verse-text">And God said, <span class="word-link">"Let there be an expanse"</span> in the midst of the waters, and let it separate the waters from the waters.</span>
+        </div>
+        <p class="wf-p-small" style="margin-top:12px;font-style:italic;">Click any highlighted word to open the inspector panel.</p>
+      </div>
+
+      <!-- Right: Inspector panel open -->
+      <div>
+        <div class="inspector">
+          <div class="inspector-title">
+            <span>Elohim &mdash; &#1488;&#1461;&#1500;&#1465;&#1492;&#1460;&#1497;&#1501;</span>
+            <button class="close" onclick="switchScreen('inspector')">&times;</button>
+          </div>
+          <div class="inspector-subtitle">Hebrew &middot; Noun &middot; 2,570 occurrences</div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Meaning</div>
+            <div class="inspector-section-value">A generic word for "god" or "God." Used with both singular and plural reference. In the Hebrew Bible, it is the most common term for the divine.</div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Lexicon</div>
+            <div class="inspector-section-value">STEPBible: S430 &middot; Strong's H430 &middot; ETCBC: 93c</div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Occurrences by Book</div>
+            <div class="wf-line w90"></div>
+            <div class="wf-line w70"></div>
+            <div class="wf-line w50"></div>
+            <div class="wf-line w30"></div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Related Concepts</div>
+            <div class="inspector-chips">
+              <span>YHWH</span>
+              <span>El Shaddai</span>
+              <span>El Elyon</span>
+              <span>Divine Council</span>
+              <span>Polytheism in the Bible</span>
+              <span>Elohim vs. YHWH</span>
+            </div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Timeline</div>
+            <div style="display:flex;gap:2px;align-items:center;padding:4px 0;">
+              <div style="flex:1;height:4px;background:#eee;border-radius:2px;">
+                <div style="width:40%;height:100%;background:#c8664a;border-radius:2px;"></div>
+              </div>
+              <span style="font-size:10px;color:#999;">Usage over time</span>
+            </div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Ancient Parallels</div>
+            <div class="inspector-section-value">Ugaritic <em>il</em>, Akkadian <em>ilu</em>, Arabic <em>Allah</em> &mdash; cognate terms across Semitic languages.</div>
+          </div>
+
+          <div class="inspector-section">
+            <div class="inspector-section-label">Connections</div>
+            <div class="inspector-chips">
+              <span>Genesis 1:1</span>
+              <span>Exodus 20:2</span>
+              <span>Deuteronomy 6:4</span>
+              <span>Psalm 82:1</span>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eee;">
+            <span class="wf-chip" style="cursor:pointer;">View in Lexicon &rarr;</span>
+            <span class="wf-chip" style="cursor:pointer;">&#128269; Search for this</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: KNOWLEDGE GRAPH
+     ============================================================ -->
+<div class="screen" id="screen-graph">
+  <div class="wf-page">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#" class="active">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0;">
+      <div class="wf-h2" style="font-size:20px;">Knowledge Graph</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" placeholder="Filter nodes..." style="padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;outline:none;" />
+        <select style="padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+          <option>All types</option>
+          <option>People</option>
+          <option>Places</option>
+          <option>Events</option>
+          <option>Concepts</option>
+          <option>Texts</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Graph canvas -->
+    <div class="graph-placeholder" style="height:460px;">
+      <!-- Simulated graph nodes -->
+      <span class="graph-label" style="top:18%;left:15%;">Abraham</span>
+      <span class="graph-label" style="top:12%;left:42%;">Covenant</span>
+      <span class="graph-label" style="top:25%;left:68%;">Moses</span>
+      <span class="graph-label" style="top:45%;left:8%;">Exodus</span>
+      <span class="graph-label" style="top:40%;left:85%;">Torah</span>
+      <span class="graph-label" style="top:55%;left:35%;color:#c8664a;font-weight:600;font-size:13px;">Elohim</span>
+      <span class="graph-label" style="top:65%;left:75%;">Prophets</span>
+      <span class="graph-label" style="top:78%;left:20%;">David</span>
+      <span class="graph-label" style="top:82%;left:60%;">Zion</span>
+      <span class="graph-label" style="top:30%;left:50%;">Israel</span>
+      <div class="graph-dot" style="top:18%;left:15%;"></div>
+      <div class="graph-dot" style="top:12%;left:42%;"></div>
+      <div class="graph-dot" style="top:25%;left:68%;"></div>
+      <div class="graph-dot" style="top:45%;left:8%;"></div>
+      <div class="graph-dot" style="top:40%;left:85%;"></div>
+      <div class="graph-dot" style="top:55%;left:35%;width:16px;height:16px;background:#c8664a;"></div>
+      <div class="graph-dot" style="top:65%;left:75%;"></div>
+      <div class="graph-dot" style="top:78%;left:20%;"></div>
+      <div class="graph-dot" style="top:82%;left:60%;"></div>
+      <div class="graph-dot" style="top:30%;left:50%;"></div>
+      <span style="color:#bbb;font-size:12px;z-index:1;background:#fafafa;padding:8px 16px;border-radius:8px;border:1px solid #eee;">
+        &#128269; Drag to explore &middot; Scroll to zoom
+      </span>
+    </div>
+
+    <!-- Detail panel below graph -->
+    <div class="wf-row" style="margin-top:16px;">
+      <div class="wf-block" style="flex:2;">
+        <div class="wf-block-title">Selected: Elohim</div>
+        <div class="wf-line w90"></div>
+        <div class="wf-line w80"></div>
+        <div class="wf-line-thin w60"></div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <span class="wf-chip">View details &rarr;</span>
+          <span class="wf-chip">Open in inspector</span>
+        </div>
+      </div>
+      <div class="wf-block" style="flex:1;">
+        <div class="wf-block-title">Connected to</div>
+        <span class="wf-chip">YHWH</span>
+        <span class="wf-chip">Genesis 1</span>
+        <span class="wf-chip">Divine Council</span>
+        <span class="wf-chip">El Shaddai</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: SEARCH RESULTS
+     ============================================================ -->
+<div class="screen" id="screen-search">
+  <div class="wf-page">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+    </div>
+
+    <!-- Search bar -->
+    <div style="margin:16px 0;">
+      <div style="display:flex;gap:0;max-width:600px;">
+        <input type="text" value="Who are the Nephilim?" style="flex:1;padding:12px 16px;border:1px solid #ccc;border-right:none;border-radius:8px 0 0 8px;font-size:14px;outline:none;" />
+        <button style="padding:12px 24px;border:1px solid #ccc;border-radius:0 8px 8px 0;background:#222;color:#fff;font-size:14px;cursor:pointer;">Search</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <span class="wf-chip" style="cursor:pointer;">&#128270; All</span>
+        <span class="wf-chip" style="cursor:pointer;">Texts</span>
+        <span class="wf-chip" style="cursor:pointer;">People</span>
+        <span class="wf-chip" style="cursor:pointer;">Places</span>
+        <span class="wf-chip" style="cursor:pointer;">Concepts</span>
+        <span class="wf-chip" style="cursor:pointer;">Manuscripts</span>
+        <span class="wf-chip" style="cursor:pointer;">Scholarship</span>
+      </div>
+    </div>
+
+    <!-- Results layout -->
+    <div class="passage-layout">
+      <!-- Main results -->
+      <div>
+        <!-- Summary card -->
+        <div class="wf-block" style="background:#fafafa;border-color:#ddd;margin-bottom:16px;">
+          <div class="wf-block-title">Summary</div>
+          <div class="wf-h3" style="font-size:15px;">The Nephilim</div>
+          <div class="wf-p" style="font-size:13px;">
+            The Nephilim are beings mentioned in Genesis 6:1-4 as the offspring of "sons of God" and "daughters of men." The Hebrew term <em>nephilim</em> (&#1504;&#1456;&#1508;&#1460;&#1497;&#1500;&#1460;&#1497;&#1501;) is traditionally translated as "giants," though its etymology is debated.
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <span class="wf-chip">&#8203;3 manuscript traditions</span>
+            <span class="wf-chip">&#8203;2 interpretive frameworks</span>
+            <span class="wf-chip">&#8203;Sources: 5</span>
+          </div>
+        </div>
+
+        <!-- Evidence -->
+        <div class="wf-block" style="margin-bottom:8px;">
+          <div class="wf-block-title">Evidence</div>
+          <div class="q-result" style="padding-left:0;">
+            <div class="q-type">Manuscript</div>
+            <div class="q-title">Genesis 6:1-4 — Masoretic Text</div>
+            <div class="q-snippet">When man began to multiply on the face of the land... the Nephilim were on the earth in those days.</div>
+          </div>
+          <div class="q-result" style="padding-left:0;">
+            <div class="q-type">Manuscript</div>
+            <div class="q-title">Genesis 6:1-4 — Septuagint (LXX)</div>
+            <div class="q-snippet">The giants (gigantes) were on the earth in those days... </div>
+          </div>
+          <div class="q-result" style="padding-left:0;">
+            <div class="q-type">Ancient Literature</div>
+            <div class="q-title">1 Enoch &mdash; The Watcher Tradition</div>
+            <div class="q-snippet">The Book of the Watchers expands on the Nephilim narrative...</div>
+          </div>
+          <div class="q-result" style="padding-left:0;">
+            <div class="q-type">Scholarship</div>
+            <div class="q-title">Etymology of Nephilim (Albright, Hendel, etc.)</div>
+            <div class="q-snippet">Three main theories: "fallen ones," "giants," or "those who cause others to fall."</div>
+          </div>
+        </div>
+
+        <!-- Related texts -->
+        <div class="wf-block" style="margin-bottom:8px;">
+          <div class="wf-block-title">Related Texts</div>
+          <span class="wf-chip">Numbers 13:33</span>
+          <span class="wf-chip">Ezekiel 32:27</span>
+          <span class="wf-chip">1 Enoch 6-16</span>
+          <span class="wf-chip">Jubilees 5:1-10</span>
+          <span class="wf-chip">Dead Sea Scrolls (4QEnoch)</span>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="wf-block" style="margin-bottom:12px;">
+          <div class="wf-block-title">Quick Facts</div>
+          <div style="font-size:12px;color:#555;">
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#999;">Mentions</span>
+              <span>3 (Gen 6:4, Num 13:33 &times;2)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#999;">Etymology</span>
+              <span>Uncertain</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;">
+              <span style="color:#999;">Traditions</span>
+              <span>MT, LXX, Enochic</span>
+            </div>
+          </div>
+        </div>
+        <div class="wf-block" style="margin-bottom:12px;">
+          <div class="wf-block-title">Timeline</div>
+          <div class="wf-box wf-box-h100" style="flex-direction:column;gap:4px;">
+            <span>Antediluvian period</span>
+            <span style="font-size:10px;color:#bbb;">&larr; Genesis 6 &mdash; Enochic tradition &mdash; Dead Sea Scrolls &rarr;</span>
+          </div>
+        </div>
+        <div class="wf-block">
+          <div class="wf-block-title">Scholarly Perspectives</div>
+          <div class="wf-line w90"></div>
+          <div class="wf-line w70"></div>
+          <div class="wf-line w80"></div>
+          <div class="wf-line-thin w50"></div>
+          <div style="margin-top:8px;">
+            <span class="wf-chip">View all &rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: RESEARCH WORKSPACE
+     ============================================================ -->
+<div class="screen" id="screen-workspace">
+  <div class="wf-page" style="max-width:100%;padding:24px 16px 64px;">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#" class="active">Research</a>
+      <div style="flex:1"></div>
+      <span class="wf-chip" style="cursor:pointer;">+ New workspace</span>
+      <span class="wf-chip" style="cursor:pointer;">Save</span>
+      <span class="wf-chip" style="font-size:11px;margin-left:8px;">Bruce H.</span>
+    </div>
+
+    <!-- Workspace title -->
+    <div style="margin:12px 0;display:flex;align-items:center;gap:12px;">
+      <div class="wf-h2" style="font-size:18px;margin:0;">Genesis 1-11 Analysis</div>
+      <span class="wf-chip" style="font-size:10px;">Last edited 2h ago</span>
+      <div style="flex:1;"></div>
+      <div style="display:flex;gap:4px;">
+        <button style="padding:4px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;font-size:11px;cursor:pointer;">+ Add panel</button>
+        <button style="padding:4px 12px;border:1px solid #ddd;border-radius:4px;background:#fff;font-size:11px;cursor:pointer;">Layout</button>
+      </div>
+    </div>
+
+    <!-- Multi-panel workspace -->
+    <div class="ws-grid">
+      <div class="ws-panel main" style="grid-row:1/3;">
+        <div class="ws-label">Reading — Genesis 1</div>
+        <div style="flex:1;overflow-y:auto;font-size:12px;color:#555;">
+          <div class="verse-row" style="font-size:12px;">
+            <span class="verse-num" style="font-size:10px;">1</span>
+            <span class="verse-text">In the beginning, <span class="word-link" style="border-color:#ddd;">God</span> created the heavens and the earth.</span>
+          </div>
+          <div class="verse-row" style="font-size:12px;">
+            <span class="verse-num" style="font-size:10px;">2</span>
+            <span class="verse-text">The earth was without form and void...</span>
+          </div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;">
+            <span class="wf-chip" style="font-size:10px;">ESV</span>
+            <span class="wf-chip" style="font-size:10px;">NRSV</span>
+            <span class="wf-chip" style="font-size:10px;">Hebrew</span>
+          </div>
+        </div>
+      </div>
+      <div class="ws-panel">
+        <div class="ws-label">Notes</div>
+        <div class="ws-content">
+          <div style="text-align:left;width:100%;font-size:12px;color:#666;padding:4px;">
+            <div style="margin-bottom:8px;">
+              <strong style="font-size:11px;">Day 1 structure</strong>
+              <div class="wf-line-thin w90"></div>
+              <div class="wf-line-thin w70"></div>
+            </div>
+            <div>
+              <strong style="font-size:11px;">Elohim usage</strong>
+              <div class="wf-line-thin w80"></div>
+              <div class="wf-line-thin w50"></div>
+            </div>
+            <div style="margin-top:8px;">
+              <span class="wf-chip" style="font-size:10px;">+ Add note</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ws-panel">
+        <div class="ws-label">Sources</div>
+        <div class="ws-content" style="flex-direction:column;gap:6px;align-items:flex-start;padding:8px;color:#666;font-size:11px;">
+          <span>Wenham, <em>Genesis 1-15</em> (WBC)</span>
+          <span>Walton, <em>ANE Thought</em></span>
+          <span>Cassuto, <em>Genesis</em></span>
+          <span style="color:#ccc;">+3 more</span>
+        </div>
+      </div>
+      <div class="ws-panel">
+        <div class="ws-label">Lexicon</div>
+        <div class="ws-content">
+          <div style="font-size:12px;color:#666;">
+            <strong>Elohim</strong>
+            <div class="wf-line-thin w80"></div>
+            <div class="wf-line-thin w50"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ws-panel">
+        <div class="ws-label">Comparison</div>
+        <div class="ws-content">
+          <div style="display:flex;gap:4px;width:100%;">
+            <div class="wf-box wf-box-h48" style="flex:1;border-style:solid;">ESV</div>
+            <div class="wf-box wf-box-h48" style="flex:1;border-style:solid;">NRSV</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: TIMELINE
+     ============================================================ -->
+<div class="screen" id="screen-timeline">
+  <div class="wf-page">
+    <div class="nav-wire">
+      <div class="logo">BLE</div>
+      <a href="#">Home</a>
+      <a href="#">Explore</a>
+      <a href="#">Library</a>
+      <a href="#">Research</a>
+      <div style="flex:1"></div>
+      <a href="#" style="font-size:18px;">&#128269;</a>
+    </div>
+
+    <div style="margin:16px 0;">
+      <div class="wf-h2" style="font-size:20px;">Historical Timeline</div>
+      <div class="wf-p-small">Scroll horizontally. Click any event to explore.</div>
+    </div>
+
+    <!-- Controls -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <select style="padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+        <option>All periods</option>
+        <option>Patriarchal</option>
+        <option>Exodus</option>
+        <option>Monarchy</option>
+        <option>Exile</option>
+        <option>Second Temple</option>
+      </select>
+      <select style="padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+        <option>Zoom: Century</option>
+        <option>Zoom: Decade</option>
+        <option>Zoom: Millennium</option>
+      </select>
+      <span class="wf-chip" style="cursor:pointer;">Kings</span>
+      <span class="wf-chip" style="cursor:pointer;">Prophets</span>
+      <span class="wf-chip" style="cursor:pointer;">Empires</span>
+      <span class="wf-chip" style="cursor:pointer;">Texts</span>
+      <span class="wf-chip" style="cursor:pointer;">Events</span>
+    </div>
+
+    <!-- Timeline -->
+    <div class="wf-block" style="overflow-x:auto;">
+      <div class="timeline-wire">
+        <div style="flex-shrink:0;width:60px;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">2000 BC</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">c. 2000</div>
+          <div class="tl-label">Abraham</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">c. 1800</div>
+          <div class="tl-label">Joseph</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">c. 1446</div>
+          <div class="tl-label">Exodus</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">c. 1010</div>
+          <div class="tl-label">David</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot active"></div>
+          <div class="tl-year">722 BC</div>
+          <div class="tl-label" style="font-weight:500;">Fall of Israel</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">586 BC</div>
+          <div class="tl-label">Fall of Judah</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">538 BC</div>
+          <div class="tl-label">Return</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">| &mdash; &mdash; |</span>
+        </div>
+        <div class="tl-event">
+          <div class="tl-dot"></div>
+          <div class="tl-year">332 BC</div>
+          <div class="tl-label">Alexander</div>
+        </div>
+        <div style="flex-shrink:0;width:60px;text-align:center;">
+          <span style="font-size:11px;color:#bbb;">70 AD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail panel (722 BC selected) -->
+    <div class="wf-row" style="margin-top:16px;">
+      <div class="wf-block" style="flex:2;">
+        <div class="wf-block-title">722 BC — Fall of the Northern Kingdom (Israel)</div>
+        <div class="wf-line w90"></div>
+        <div class="wf-line w80"></div>
+        <div class="wf-line w70"></div>
+        <div class="wf-line-thin w50"></div>
+        <div style="margin-top:8px;">
+          <span class="wf-chip">Biblical texts: 2 Kings 17</span>
+          <span class="wf-chip">Prophet: Hosea</span>
+          <span class="wf-chip">Empire: Assyria</span>
+          <span class="wf-chip">Archaeology: Samaria inscriptions</span>
+        </div>
+      </div>
+      <div class="wf-block" style="flex:1;">
+        <div class="wf-block-title">Connected</div>
+        <span class="wf-chip">Hosea</span>
+        <span class="wf-chip">Assyrian Empire</span>
+        <span class="wf-chip">Samaria</span>
+        <span class="wf-chip">Ten Lost Tribes</span>
+        <span class="wf-chip">2 Kings 17</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WIREFRAME: MOBILE VIEW
+     ============================================================ -->
+<div class="screen" id="screen-mobile">
+  <div class="wf-page" style="max-width:400px;margin:0 auto;background:#fff;min-height:100vh;border:1px solid #ddd;border-radius:8px;overflow:hidden;padding:0;">
+    <!-- Simple mobile chrome -->
+    <div style="background:#222;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:600;">BLE</span>
+      <span style="font-size:20px;">&#128269;</span>
+    </div>
+
+    <div style="padding:16px;">
+      <div class="wf-h2" style="font-size:18px;">Genesis 1</div>
+      <div style="display:flex;gap:4px;margin:8px 0;overflow-x:auto;">
+        <span class="wf-chip" style="font-size:10px;background:#c8664a;color:#fff;">Read</span>
+        <span class="wf-chip" style="font-size:10px;">Understand</span>
+        <span class="wf-chip" style="font-size:10px;">Explore</span>
+        <span class="wf-chip" style="font-size:10px;">Research</span>
+      </div>
+      <div style="font-size:11px;color:#999;margin:8px 0;">
+        <select style="font-size:11px;padding:4px 8px;border:1px solid #ddd;border-radius:4px;">
+          <option>English Standard Version</option>
+        </select>
+      </div>
+
+      <div class="verse-row" style="font-size:13px;">
+        <span class="verse-num" style="font-size:10px;">1</span>
+        <span class="verse-text">In the beginning, <span class="word-link">God</span> created the heavens and the earth.</span>
+      </div>
+      <div class="verse-row" style="font-size:13px;">
+        <span class="verse-num" style="font-size:10px;">2</span>
+        <span class="verse-text">The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters.</span>
+      </div>
+      <div class="verse-row" style="font-size:13px;">
+        <span class="verse-num" style="font-size:10px;">3</span>
+        <span class="verse-text">And God said, <span class="word-link">"Let there be light"</span>, and there was light.</span>
+      </div>
+      <div class="verse-row" style="font-size:13px;">
+        <span class="verse-num" style="font-size:10px;">4</span>
+        <span class="verse-text">And God saw that the light was good. And God separated the light from the darkness.</span>
+      </div>
+    </div>
+
+    <!-- Bottom sheet (tapped "God") -->
+    <div style="border-top:1px solid #ddd;background:#fafafa;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:600;font-size:14px;">Elohim</span>
+        <span style="font-size:10px;color:#999;">Hebrew &#1488;&#1461;&#1500;&#1465;&#1492;&#1460;&#1497;&#1501;</span>
+      </div>
+      <div class="wf-line w90"></div>
+      <div class="wf-line w70"></div>
+      <div style="margin-top:8px;">
+        <span class="wf-chip" style="font-size:10px;">View full entry &rarr;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN SWITCHING
+     ============================================================ -->
+<script>
+function switchScreen(id) {
+  const screens = document.querySelectorAll('.screen');
+  screens.forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.wf-bar button');
+  btns.forEach(b => b.classList.remove('active'));
+  btns.forEach(b => {
+    if (b.dataset.screen === id) b.classList.add('active');
+  });
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.wf-bar button').forEach(btn => {
+  btn.addEventListener('click', () => switchScreen(btn.dataset.screen));
+});
+</script>
+
+</body>
+</html>

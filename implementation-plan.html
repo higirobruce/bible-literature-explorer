@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Implementation Plan — Biblical Literature Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Literata:opsz,wght@7..72,400;5..7..72,00;6..7..72,00&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --warm-white:   #F7F3EE;
+  --stone:        #8B8178;
+  --slate:        #3D3D3D;
+  --olive:        #7A8B6F;
+  --terracotta:   #C8664A;
+  --sand:         #D4C5B0;
+  --deep-indigo:  #1E2440;
+  --muted-copper: #B8735A;
+
+  --bg-base:      var(--warm-white);
+  --bg-card:      #FFFFFF;
+  --bg-surface:   #FCFAF7;
+  --bg-muted:     rgba(30, 36, 64, 0.04);
+  --text-primary: var(--slate);
+  --text-heading: var(--deep-indigo);
+  --text-secondary:#6B6560;
+  --text-muted:   #9C9590;
+  --border-light: rgba(139, 129, 120, 0.18);
+  --border-med:   rgba(139, 129, 120, 0.30);
+  --accent:       var(--terracotta);
+  --accent-subtle:rgba(200, 102, 74, 0.08);
+  --accent-subtler:rgba(200, 102, 74, 0.04);
+  --tag-bg:       rgba(30, 36, 64, 0.06);
+  --tag-text:     var(--deep-indigo);
+
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Literata', Georgia, 'Times New Roman', serif;
+  --font-mono:    'SF Mono', 'Fira Code', monospace;
+
+  --space-1: 0.25rem;  --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;    --space-6: 1.5rem;   --space-8: 2rem;
+  --space-10: 2.5rem; --space-12: 3rem;    --space-16: 4rem;
+
+  --radius-sm: 4px;  --radius-md: 8px;  --radius-lg: 12px;
+  --radius-xl: 16px; --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(30,36,64,0.06);
+  --shadow-md: 0 4px 12px rgba(30,36,64,0.07);
+  --shadow-lg: 0 8px 30px rgba(30,36,64,0.08);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-base);
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--text-heading);
+  letter-spacing: -0.01em;
+}
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; margin-top: var(--space-12); margin-bottom: var(--space-4); }
+h3 { font-size: 1.25rem; margin-top: var(--space-8); margin-bottom: var(--space-3); }
+h4 { font-size: 1.05rem; margin-top: var(--space-6); margin-bottom: var(--space-2); }
+
+p { margin-bottom: var(--space-4); color: var(--text-primary); max-width: 42rem; }
+a { color: var(--deep-indigo); text-decoration: none; transition: color 0.15s; }
+a:hover { color: var(--terracotta); }
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--tag-bg);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+}
+ul, ol { margin-bottom: var(--space-4); padding-left: var(--space-6); }
+li { margin-bottom: var(--space-1); }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  position: sticky; top: 0;
+  width: 240px; height: 100vh;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-3);
+  border-right: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  font-family: var(--font-heading);
+  font-size: var(--space-3);
+  color: var(--text-heading);
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.01em;
+}
+.sidebar-logo small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0;
+}
+.sidebar nav { margin-bottom: var(--space-6); }
+.sidebar-group {
+  margin-bottom: var(--space-1);
+}
+.sidebar-group-title {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: var(--space-2) var(--space-3);
+  pointer-events: none;
+}
+.sidebar a {
+  display: block;
+  font-size: var(--space-3);
+  color: var(--text-secondary);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-md);
+  transition: all 0.15s;
+}
+.sidebar a:hover {
+  color: var(--text-heading);
+  background: var(--tag-bg);
+}
+.sidebar a.active {
+  color: var(--text-heading);
+  font-weight: 500;
+  background: var(--accent-subtle);
+}
+
+/* Main */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-8) var(--space-12) var(--space-16);
+  max-width: 1000px;
+}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+
+/* Hero */
+.hero {
+  padding: var(--space-8) 0 var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-light);
+}
+.hero h1 { margin-bottom: var(--space-2); }
+.hero .subtitle { font-size: 1.05rem; color: var(--text-secondary); max-width: 36rem; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle);
+  color: var(--terracotta);
+  white-space: nowrap;
+  margin-bottom: var(--space-2);
+}
+.badge-mvp {
+  background: var(--tag-bg);
+  color: var(--deep-indigo);
+}
+.badge-phase {
+  background: rgba(122, 139, 111, 0.12);
+  color: var(--olive);
+}
+.badge-future {
+  background: rgba(139, 129, 120, 0.1);
+  color: var(--stone);
+}
+
+/* Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-title { font-size: 1rem; font-weight: 500; margin-bottom: var(--space-2); }
+.card p { font-size: 0.9rem; margin-bottom: var(--space-2); }
+.card:last-child p { margin-bottom: 0; }
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+/* Phase card */
+.phase-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.phase-header:hover { background: var(--accent-subtler); }
+.phase-num {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--terracotta);
+  flex-shrink: 0;
+}
+.phase-info { flex: 1; }
+.phase-info h3 { margin: 0; font-size: 1.1rem; }
+.phase-info .meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.phase-body {
+  padding: 0 var(--space-6) var(--space-4);
+}
+.phase-body ul { margin: var(--space-2) 0; }
+.phase-body ul li { font-size: 0.9rem; margin-bottom: 2px; }
+.phase-body .chip { font-size: 0.78rem; }
+
+/* Route table */
+.route-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: var(--space-4) 0;
+}
+.route-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--border-med);
+}
+.route-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+.route-table tr:last-child td { border-bottom: none; }
+.route-table code { font-size: 0.82em; }
+
+/* Chip */
+.chip {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  border-radius: var(--radius-full);
+  margin: 2px 4px 2px 0;
+}
+.chip-outline {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+.chip-accent {
+  background: var(--accent-subtle);
+  color: var(--terracotta);
+}
+.chip-olive {
+  background: rgba(122, 139, 111, 0.1);
+  color: var(--olive);
+}
+.chip-sm { font-size: 0.72rem; padding: 1px 7px; }
+
+/* Stack (inline tag list) */
+.stack { display: flex; flex-wrap: wrap; gap: 4px; margin: var(--space-2) 0; }
+
+/* Section rule */
+.section-rule {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: var(--space-10) 0;
+}
+
+/* Scope columns */
+.scope-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin: var(--space-4) 0;
+}
+.scope-col h4 { margin-top: 0; margin-bottom: var(--space-3); }
+
+/* Checklist */
+.checklist { list-style: none; padding: 0; }
+.checklist li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.checklist li:last-child { border-bottom: none; }
+.checkmark { color: var(--olive); font-weight: 700; flex-shrink: 0; }
+.crossmark { color: var(--text-muted); flex-shrink: 0; }
+
+/* Dependency arrow */
+.dep-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  font-size: 0.9rem;
+}
+.dep-row .arrow { color: var(--text-muted); font-size: 1.2rem; }
+
+/* Timeline-ish */
+.milestone-list { list-style: none; padding: 0; }
+.milestone-list li {
+  padding: var(--space-3) 0 var(--space-3) var(--space-6);
+  border-left: 2px solid var(--accent);
+  position: relative;
+  margin-bottom: var(--space-2);
+}
+.milestone-list li::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: var(--space-3);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.milestone-list li h4 { margin: 0 0 2px; font-size: 1rem; }
+.milestone-list li .meta { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Callout */
+.callout {
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid var(--terracotta);
+  background: var(--accent-subtler);
+  margin: var(--space-6) 0;
+}
+.callout p { margin: 0; font-size: 0.9rem; }
+.callout p + p { margin-top: var(--space-2); }
+
+/* Sprint grid */
+.sprint-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+.sprint-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+.sprint-card h5 { margin: 0 0 var(--space-1); font-size: 0.95rem; }
+.sprint-card .tasks { font-size: 0.82rem; color: var(--text-secondary); }
+.sprint-card .tasks span { display: block; margin-bottom: 2px; }
+
+/* Responsive */
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { padding: var(--space-4) var(--space-6) var(--space-12); }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.35rem; }
+  .scope-grid { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .main { max-width: 100%; padding: 0; }
+  .phase-card, .card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============================================================
+       SIDEBAR
+       ============================================================ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      Biblical Literature Explorer
+      <small>Implementation Plan &mdash; MVP v1.1</small>
+    </div>
+    <nav>
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">Scope</span>
+        <a href="#mvp">MVP Definition</a>
+        <a href="#out">Out of Scope</a>
+      </div>
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">Architecture</span>
+        <a href="#arch">System Overview</a>
+        <a href="#routes">Route Design</a>
+        <a href="#data">Data Models</a>
+        <a href="#api">API Endpoints</a>
+      </div>
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">Build</span>
+        <a href="#components">Component Tree</a>
+        <a href="#phases">Implementation Phases</a>
+        <a href="#sprints">Sprint Breakdown</a>
+        <a href="#decisions">Key Decisions</a>
+      </div>
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">Post-MVP</span>
+        <a href="#postmvp">Roadmap Overview</a>
+        <a href="#postmvp-phase7">Layer 3: Explore</a>
+        <a href="#postmvp-phase8">Layer 4: Research</a>
+        <a href="#postmvp-phase9">Knowledge Graph</a>
+        <a href="#postmvp-phase10">Workspace</a>
+        <a href="#postmvp-phase11">Maps</a>
+        <a href="#postmvp-phase12">AI Assistant</a>
+        <a href="#postmvp-phase13">Community</a>
+        <a href="#postmvp-phase14">Platform Depth</a>
+      </div>
+      <div class="sidebar-group">
+        <span class="sidebar-group-title">Reference</span>
+        <a href="#deps">Dependencies</a>
+        <a href="#schema">Database Schema</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <main class="main">
+
+    <!-- HERO -->
+    <header class="hero" id="top">
+      <span class="badge">MVP v1.1</span>
+      <h1>Implementation Plan</h1>
+      <p class="subtitle">A phased build plan for the Biblical Literature Explorer, scoped to deliver a working reading-and-research MVP as quickly as possible while preserving the architectural runway for depth.</p>
+    </header>
+
+    <!-- ============================================================
+         MVP DEFINITION
+         ============================================================ -->
+    <section id="mvp">
+      <span class="badge badge-mvp">Scope</span>
+      <h2>MVP Definition</h2>
+      <p>The MVP delivers a <strong>readable, searchable, annotated Bible</strong> with progressive disclosure. Users can read passages, switch translations, click words to inspect them, see discovery cards, and search by natural language query. Authentication enables sync.</p>
+
+      <div class="scope-grid">
+        <div class="scope-col">
+          <h4><span class="chip chip-olive" style="margin-right:6px;">&#10003;</span> In Scope (MVP)</h4>
+          <ul class="checklist">
+            <li><span class="checkmark">&#10003;</span> Passage reading with translation selector</li>
+            <li><span class="checkmark">&#10003;</span> Chapter navigation &amp; breadcrumbs</li>
+            <li><span class="checkmark">&#10003;</span> Layer 1-2 content (Read + Understand)</li>
+            <li><span class="checkmark">&#10003;</span> Word-level inspector panel (click to reveal)</li>
+            <li><span class="checkmark">&#10003;</span> Inline discovery cards</li>
+            <li><span class="checkmark">&#10003;</span> Search (basic + natural language)</li>
+            <li><span class="checkmark">&#10003;</span> Homepage with discovery surface</li>
+            <li><span class="checkmark">&#10003;</span> Highlights, bookmarks, personal notes</li>
+            <li><span class="checkmark">&#10003;</span> Google + Apple authentication</li>
+            <li><span class="checkmark">&#10003;</span> User preferences sync across devices</li>
+            <li><span class="checkmark">&#10003;</span> Responsive mobile + desktop layout</li>
+            <li><span class="checkmark">&#10003;</span> Static knowledge graph (entity pages)</li>
+          </ul>
+        </div>
+        <div class="scope-col" id="out">
+          <h4><span class="chip" style="margin-right:6px;">&mdash;</span> Out of Scope (Post-MVP)</h4>
+          <ul class="checklist">
+            <li><span class="crossmark">&ndash;</span> Interactive knowledge graph visualization &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.4</a></li>
+            <li><span class="crossmark">&ndash;</span> Multi-panel research workspace &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.5</a></li>
+            <li><span class="crossmark">&ndash;</span> Zoomable interactive timeline &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.2</a></li>
+            <li><span class="crossmark">&ndash;</span> Map viewer (Leaflet/MapLibre) &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.6</a></li>
+            <li><span class="crossmark">&ndash;</span> Layer 4 research tools &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.3</a></li>
+            <li><span class="crossmark">&ndash;</span> AI assistant / question answering &rarr; <a href="#postmvp" style="font-size:0.82rem;">v2.0</a></li>
+            <li><span class="crossmark">&ndash;</span> Collections and curated reading lists &rarr; <a href="#postmvp" style="font-size:0.82rem;">v2.1</a></li>
+            <li><span class="crossmark">&ndash;</span> Citation graph visualization &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.3</a></li>
+            <li><span class="crossmark">&ndash;</span> Comparison viewer (side-by-side manuscripts) &rarr; <a href="#postmvp" style="font-size:0.82rem;">v1.3</a></li>
+            <li><span class="crossmark">&ndash;</span> Command palette &rarr; <a href="#postmvp" style="font-size:0.82rem;">v2.2</a></li>
+            <li><span class="crossmark">&ndash;</span> Social / sharing features &rarr; <a href="#postmvp" style="font-size:0.82rem;">v2.1</a></li>
+            <li><span class="crossmark">&ndash;</span> Offline support (PWA) &rarr; <a href="#postmvp" style="font-size:0.82rem;">v2.2</a></li>
+          </ul>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-top:var(--space-3);">See <a href="#postmvp">Post-MVP Roadmap</a> for full details on each phase.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         SYSTEM OVERVIEW
+         ============================================================ -->
+    <section id="arch">
+      <span class="badge badge-mvp">Architecture</span>
+      <h2>System Overview</h2>
+
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-8);align-items:flex-start;">
+          <div style="flex:1;min-width:200px;">
+            <div class="card-title">Frontend</div>
+            <div class="stack">
+              <span class="chip chip-accent">Next.js (App Router)</span>
+              <span class="chip">TypeScript</span>
+              <span class="chip">Tailwind CSS</span>
+              <span class="chip">shadcn/ui</span>
+              <span class="chip">Radix UI</span>
+              <span class="chip">TanStack Query</span>
+              <span class="chip">TipTap (notes)</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div class="card-title">Backend</div>
+            <div class="stack">
+              <span class="chip chip-accent">NestJS</span>
+              <span class="chip">Node.js</span>
+              <span class="chip">NextAuth.js</span>
+            </div>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div class="card-title">Data Layer</div>
+            <div class="stack">
+              <span class="chip chip-accent">MongoDB</span>
+              <span class="chip">Neo4j</span>
+              <span class="chip">OpenSearch</span>
+              <span class="chip">Redis</span>
+              <span class="chip">MinIO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Data Flow (MVP)</h3>
+      <div class="card" style="background:var(--accent-subtler);border-color:var(--border-med);">
+        <p style="max-width:100%;font-family:var(--font-mono);font-size:0.85rem;line-height:2;margin:0;">
+          <strong style="font-family:var(--font-body);">[Browser]</strong><br />
+          &nbsp;&nbsp;Next.js (App Router) &rarr; Server Components (SSR) for passages<br />
+          &nbsp;&nbsp;Client Components for inspector, search, highlights<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&darr; fetch (TanStack Query)<br />
+          <strong style="font-family:var(--font-body);">[NestJS API]</strong><br />
+          &nbsp;&nbsp;/api/passages &rarr; MongoDB<br />
+          &nbsp;&nbsp;/api/search &rarr; OpenSearch<br />
+          &nbsp;&nbsp;/api/entities &rarr; Neo4j<br />
+          &nbsp;&nbsp;/api/auth &rarr; NextAuth.js + MongoDB session store<br />
+          &nbsp;&nbsp;/api/users &rarr; MongoDB (preferences, highlights, notes)<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&darr; cached via Redis<br />
+          <strong style="font-family:var(--font-body);">[Neo4j]</strong> Entity graph (people, places, concepts, their relationships)<br />
+          <strong style="font-family:var(--font-body);">[OpenSearch]</strong> Full-text + fuzzy search across all content<br />
+          <strong style="font-family:var(--font-body);">[MinIO]</strong> Static assets: manuscript images, map tiles (MVP: minimal)
+        </p>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         ROUTE DESIGN
+         ============================================================ -->
+    <section id="routes">
+      <span class="badge badge-mvp">Architecture</span>
+      <h2>Route Design (Next.js App Router)</h2>
+      <table class="route-table">
+        <thead>
+          <tr>
+            <th>Route</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>MVP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/</code></td>
+            <td>SSR</td>
+            <td>Homepage — hero prompt, continue reading, discovery sections</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/passage/[book]/[chapter]</code></td>
+            <td>SSR</td>
+            <td>Passage reading view with translation selector, verse text</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/passage/[book]/[chapter]?verse=[v]</code></td>
+            <td>SSR</td>
+            <td>Verse-anchored passage view</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/search</code></td>
+            <td>CSR</td>
+            <td>Search results page (Perplexity-style summary + evidence)</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/entity/[type]/[slug]</code></td>
+            <td>SSR</td>
+            <td>Entity page (person, place, concept) — static knowledge graph</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/library</code></td>
+            <td>SSR</td>
+            <td>Browse books of the Bible, translations, apocrypha</td>
+            <td><span class="chip chip-sm chip-olive">Phase 2</span></td>
+          </tr>
+          <tr>
+            <td><code>/explore</code></td>
+            <td>CSR</td>
+            <td>Topics, timeline preview, connections browser</td>
+            <td><span class="chip chip-sm chip-olive">Phase 2</span></td>
+          </tr>
+          <tr>
+            <td><code>/profile</code></td>
+            <td>CSR</td>
+            <td>User settings, preferences, highlights list, notes</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+          <tr>
+            <td><code>/workspace/[id]</code></td>
+            <td>CSR</td>
+            <td>Research workspace (multi-panel, logged-in only)</td>
+            <td><span class="chip chip-sm">Future</span></td>
+          </tr>
+          <tr>
+            <td><code>/api/*</code></td>
+            <td>&mdash;</td>
+            <td>NestJS API routes (see API section)</td>
+            <td><span class="chip chip-sm chip-accent">MVP</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         DATA MODELS
+         ============================================================ -->
+    <section id="data">
+      <span class="badge badge-mvp">Architecture</span>
+      <h2>Data Models</h2>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title"><code>Passage</code> &mdash; MongoDB</div>
+          <p style="font-size:0.82rem;font-family:var(--font-mono);">
+            {<br />
+            &nbsp;&nbsp;book: string,<br />
+            &nbsp;&nbsp;chapter: number,<br />
+            &nbsp;&nbsp;verses: [{<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;num: number,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;text: string,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;translation: string,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;words: [{<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;position: number,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hebrew?: string,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;greek?: string,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;strongs?: string<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;}]<br />
+            &nbsp;&nbsp;}],<br />
+            &nbsp;&nbsp;metadata: {<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;section, genre, date_range<br />
+            &nbsp;&nbsp;}<br />
+            }
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title"><code>Entity</code> &mdash; Neo4j</div>
+          <p style="font-size:0.82rem;font-family:var(--font-mono);">
+            (:Entity {<br />
+            &nbsp;&nbsp;id: string,<br />
+            &nbsp;&nbsp;type: 'Person'|'Place'|'Concept'<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;|'Event'|'Text'|'Artifact'|'Kingdom',<br />
+            &nbsp;&nbsp;name: string,<br />
+            &nbsp;&nbsp;slug: string,<br />
+            &nbsp;&nbsp;summary: text,<br />
+            &nbsp;&nbsp;lexicon?: { strongs, stepbible, etcbc }<br />
+            })<br />
+            <br />
+            (:Entity)-[:MENTIONED_IN]->(:Passage)<br />
+            (:Entity)-[:RELATED_TO]->(:Entity)
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title"><code>User</code> &mdash; MongoDB</div>
+          <p style="font-size:0.82rem;font-family:var(--font-mono);">
+            {<br />
+            &nbsp;&nbsp;id: ObjectId,<br />
+            &nbsp;&nbsp;accounts: [<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;{ provider, providerId }<br />
+            &nbsp;&nbsp;],<br />
+            &nbsp;&nbsp;preferences: {<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;defaultTranslation,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;fontSize, theme<br />
+            &nbsp;&nbsp;},<br />
+            &nbsp;&nbsp;highlights: [{<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;passageId, verseRange,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;color, note?, createdAt<br />
+            &nbsp;&nbsp;}],<br />
+            &nbsp;&nbsp;bookmarks: [passageId],<br />
+            &nbsp;&nbsp;workspaces: [workspaceId]<br />
+            }
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title"><code>SearchIndex</code> &mdash; OpenSearch</div>
+          <p style="font-size:0.82rem;font-family:var(--font-mono);">
+            index: "passages"<br />
+            {<br />
+            &nbsp;&nbsp;book, chapter, verse,<br />
+            &nbsp;&nbsp;text (multi-translation),<br />
+            &nbsp;&nbsp;entities: [entityId],<br />
+            &nbsp;&nbsp;hebrew_text?, greek_text?<br />
+            }<br />
+            <br />
+            index: "entities"<br />
+            { name, type, summary,<br />
+            &nbsp;&nbsp;aliases, related }
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         API ENDPOINTS
+         ============================================================ -->
+    <section id="api">
+      <span class="badge badge-mvp">Architecture</span>
+      <h2>API Endpoints (NestJS)</h2>
+      <table class="route-table">
+        <thead>
+          <tr>
+            <th>Endpoint</th>
+            <th>Method</th>
+            <th>Description</th>
+            <th>Cache</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/api/passages/:book/:chapter</code></td>
+            <td>GET</td>
+            <td>Return passage text in requested translation(s)</td>
+            <td>Redis (TTL 1h)</td>
+          </tr>
+          <tr>
+            <td><code>/api/passages/:book/:chapter/words</code></td>
+            <td>GET</td>
+            <td>Word-level data (Hebrew, Greek, Strong's) for a passage — sourced from Macula Hebrew + ETCBC</td>
+            <td>Redis (TTL 1h)</td>
+          </tr>
+          <tr>
+            <td><code>/api/entities/:type/:slug</code></td>
+            <td>GET</td>
+            <td>Entity detail (summary, occurrences, related, timeline)</td>
+            <td>Redis (TTL 30m)</td>
+          </tr>
+          <tr>
+            <td><code>/api/entities/search</code></td>
+            <td>GET</td>
+            <td>Autocomplete / lookup entities by name prefix</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/search</code></td>
+            <td>GET</td>
+            <td>Full-text search across passages + entities (OpenSearch)</td>
+            <td>Redis (TTL 5m)</td>
+          </tr>
+          <tr>
+            <td><code>/api/users/me</code></td>
+            <td>GET</td>
+            <td>Current user profile + preferences</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/users/me/highlights</code></td>
+            <td>GET/POST</td>
+            <td>List or create a highlight</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/users/me/highlights/:id</code></td>
+            <td>DELETE</td>
+            <td>Remove a highlight</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/users/me/bookmarks</code></td>
+            <td>GET/POST</td>
+            <td>List or add a bookmark</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/users/me/notes</code></td>
+            <td>GET/POST/PUT</td>
+            <td>Personal notes on passages</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/home</code></td>
+            <td>GET</td>
+            <td>Personalized homepage data (continue reading, recent activity)</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td><code>/api/discovery/:passageId</code></td>
+            <td>GET</td>
+            <td>Discovery cards for a given passage</td>
+            <td>Redis (TTL 30m)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         COMPONENT TREE
+         ============================================================ -->
+    <section id="components">
+      <span class="badge badge-mvp">Build</span>
+      <h2>Component Tree</h2>
+      <p>Organized by feature area. MVP components marked with <span class="chip chip-sm chip-accent">M</span>.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Shell <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>RootLayout</code> &mdash; fonts, metadata, providers<br />
+            <code>AppShell</code> &mdash; nav bar + sidebar + main area<br />
+            <code>NavBar</code> &mdash; Home, Explore, Library, Search, Profile<br />
+            <code>Sidebar</code> &mdash; contextual navigation (desktop)<br />
+            <code>MobileNav</code> &mdash; bottom tab bar (mobile)<br />
+            <code>SearchBar</code> &mdash; global search trigger/input
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Passage <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>PassagePage</code> &mdash; server component, fetches passage<br />
+            <code>TranslationSelector</code> &mdash; dropdown, multi-select<br />
+            <code>VerseList</code> &mdash; renders verses with word-level data<br />
+            <code>VerseRow</code> &mdash; single verse with clickable words<br />
+            <code>LayerPills</code> &mdash; 1-4 layer navigation tabs<br />
+            <code>Breadcrumb</code> &mdash; passage location breadcrumb<br />
+            <code>ChapterNav</code> &mdash; prev/next chapter controls
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Inspector <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>InspectorPanel</code> &mdash; right-side sliding panel<br />
+            <code>LexiconSection</code> &mdash; meaning, Strong's, STEPBible, ETCBC data, occurrences<br />
+            <code>RelatedConceptsSection</code> &mdash; chips for connected entities<br />
+            <code>TimelineSection</code> &mdash; mini usage-over-time bar<br />
+            <code>ConnectionsSection</code> &mdash; linked passages/entities<br />
+            <code>InspectorTrigger</code> &mdash; clickable word in verse
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Discovery <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>DiscoveryCardDeck</code> &mdash; horizontal/inline card list<br />
+            <code>DiscoveryCard</code> &mdash; icon + title + description<br />
+            <code>AncientContextCard</code><br />
+            <code>RelatedLiteratureCard</code><br />
+            <code>PeopleCard</code><br />
+            <code>PlacesCard</code><br />
+            <code>QuestionCard</code>
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Homepage <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>HomePage</code> &mdash; server component<br />
+            <code>HeroSearch</code> &mdash; prompt + search input<br />
+            <code>QuickTopics</code> &mdash; pill navigation chips<br />
+            <code>ContinueReading</code> &mdash; recent passages card<br />
+            <code>TodayDiscovery</code> &mdash; curated highlight card<br />
+            <code>TopicGrid</code> &mdash; 2x4 grid of topic cards<br />
+            <code>RecentActivity</code> &mdash; notes, bookmarks summary
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Search <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>SearchPage</code> &mdash; results page (CSR)<br />
+            <code>SearchInput</code> &mdash; query input with suggestions<br />
+            <code>SearchFilters</code> &mdash; type, translation, book filters<br />
+            <code>SummaryCard</code> &mdash; AI-generated summary (or curated)<br />
+            <code>EvidenceList</code> &mdash; manuscript/source results<br />
+            <code>RelatedTexts</code> &mdash; chip list of connected passages<br />
+            <code>QuickFacts</code> &mdash; sidebar metadata panel
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Entity <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>EntityPage</code> &mdash; SSR entity detail page<br />
+            <code>EntityHeader</code> &mdash; name, type, Hebrew/Greek<br />
+            <code>EntitySummary</code> &mdash; description with source citations<br />
+            <code>OccurrenceList</code> &mdash; where entity appears<br />
+            <code>EntityConnections</code> &mdash; related entities graph<br />
+            <code>EntityTimeline</code> &mdash; chronological context
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Profile <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>ProfilePage</code> &mdash; user settings + data<br />
+            <code>HighlightsList</code> &mdash; saved highlights by passage<br />
+            <code>BookmarksList</code> &mdash; saved passages<br />
+            <code>NotesList</code> &mdash; personal notes<br />
+            <code>PreferencesForm</code> &mdash; translation, theme, font
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Shared <span class="chip chip-sm chip-accent">M</span></div>
+          <p>
+            <code>AuthProvider</code> &mdash; NextAuth session wrapper<br />
+            <code>QueryProvider</code> &mdash; TanStack Query client<br />
+            <code>ThemeProvider</code> &mdash; light/dark mode<br />
+            <code>Toaster</code> &mdash; toast notifications<br />
+            <code>LoadingState</code> &mdash; skeleton loaders<br />
+            <code>EmptyState</code> &mdash; empty/no-results states<br />
+            <code>ErrorBoundary</code> &mdash; per-page error handling
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         IMPLEMENTATION PHASES
+         ============================================================ -->
+    <section id="phases">
+      <span class="badge badge-mvp">Build</span>
+      <h2>Implementation Phases</h2>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">0</span>
+          <div class="phase-info">
+            <h3>Foundation &amp; Scaffolding</h3>
+            <div class="meta">Sprint 0 &middot; Est. 1 week</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">Next.js</span>
+            <span class="chip chip-accent">NestJS</span>
+            <span class="chip chip-accent">Docker</span>
+            <span class="chip chip-accent">Design tokens</span>
+          </div>
+          <ul>
+            <li>Initialize Next.js + TypeScript + Tailwind + shadcn/ui</li>
+            <li>Initialize NestJS project with module structure</li>
+            <li>Set up Docker Compose for MongoDB, Neo4j, Redis, OpenSearch, MinIO</li>
+            <li>Establish design token CSS file (from spec's design system)</li>
+            <li>Build AppShell, NavBar, Sidebar, MobileNav layout components</li>
+            <li>Configure NextAuth.js with Google + Apple providers</li>
+            <li>Set up CI (GitHub Actions — lint, typecheck, test)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">1</span>
+          <div class="phase-info">
+            <h3>Core Reading Experience</h3>
+            <div class="meta">Sprint 1-2 &middot; Est. 2 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">PassagePage</span>
+            <span class="chip chip-accent">VerseList</span>
+            <span class="chip chip-accent">TranslationSelector</span>
+            <span class="chip">MongoDB seed script</span>
+          </div>
+          <ul>
+            <li>Seed MongoDB with Bible text (multiple translations: ESV, NIV, KJV, NRSV, NASB)</li>
+            <li>Build <code>/api/passages/:book/:chapter</code> endpoint</li>
+            <li>Build <code>PassagePage</code> server component with SSR</li>
+            <li>Build <code>VerseList</code> + <code>VerseRow</code> with word-level click targets</li>
+            <li>Build <code>TranslationSelector</code> — switch translation, preserve scroll position</li>
+            <li>Build <code>ChapterNav</code> and breadcrumb navigation</li>
+            <li>Build <code>LayerPills</code> visual indicator (Layer 1 only for now)</li>
+            <li>Responsive layout: reading pane on mobile, sidebar on desktop</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">2</span>
+          <div class="phase-info">
+            <h3>Inspector Panel + Discovery Cards</h3>
+            <div class="meta">Sprint 2-3 &middot; Est. 2 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">InspectorPanel</span>
+            <span class="chip chip-accent">DiscoveryCard</span>
+            <span class="chip">Neo4j entity seed</span>
+          </div>
+          <ul>
+            <li>Seed Neo4j with entities (people, places, concepts, events) and relationships</li>
+            <li>Build <code>/api/entities/:type/:slug</code> and <code>/api/discovery/:passageId</code></li>
+            <li>Build <code>InspectorPanel</code> — slides in from right, shows entity data</li>
+            <li>Build <code>LexiconSection</code>, <code>RelatedConceptsSection</code>, <code>ConnectionsSection</code></li>
+            <li>Build <code>DiscoveryCardDeck</code> — inline below passage text</li>
+            <li>Build 6 discovery card types (ANE, Literature, People, Places, Quoted, Question)</li>
+            <li>Highlight "clickable" words in passage text (dashed underline)</li>
+            <li>Animate panel in/out with CSS transitions</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">3</span>
+          <div class="phase-info">
+            <h3>Search &amp; Homepage</h3>
+            <div class="meta">Sprint 3-4 &middot; Est. 2 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">OpenSearch</span>
+            <span class="chip chip-accent">SearchPage</span>
+            <span class="chip chip-accent">HomePage</span>
+          </div>
+          <ul>
+            <li>Seed OpenSearch with passages + entities</li>
+            <li>Build <code>/api/search</code> — full-text + fuzzy search, type filters</li>
+            <li>Build <code>SearchPage</code> with <code>SearchInput</code>, facet filters</li>
+            <li>Build <code>SummaryCard</code>, <code>EvidenceList</code>, <code>QuickFacts</code> sidebar</li>
+            <li>Build <code>HomePage</code> server component with hero + topic grid</li>
+            <li>Build <code>ContinueReading</code>, <code>TodayDiscovery</code>, <code>TopicGrid</code></li>
+            <li>Search results route: <code>?q=...&amp;type=...&amp;translation=...</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">4</span>
+          <div class="phase-info">
+            <h3>User Features: Auth, Highlights, Bookmarks, Notes</h3>
+            <div class="meta">Sprint 4-5 &middot; Est. 1.5 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">NextAuth.js</span>
+            <span class="chip chip-accent">User API</span>
+            <span class="chip">TipTap</span>
+          </div>
+          <ul>
+            <li>Finalize Google + Apple OAuth flow with NextAuth.js</li>
+            <li>Build user API endpoints (profile, preferences)</li>
+            <li>Build highlight system: select text &rarr; color picker &rarr; save to MongoDB</li>
+            <li>Build bookmark system: save passage + verse reference</li>
+            <li>Build notes system (TipTap editor for rich text notes per passage)</li>
+            <li>Build <code>ProfilePage</code> with lists for highlights, bookmarks, notes</li>
+            <li>Sync all user data across devices on sign-in</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">5</span>
+          <div class="phase-info">
+            <h3>Entity Pages &amp; Layer 2 Content</h3>
+            <div class="meta">Sprint 5-6 &middot; Est. 2 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">EntityPage</span>
+            <span class="chip">Understand layer</span>
+          </div>
+          <ul>
+            <li>Build <code>EntityPage</code> SSR for people, places, concepts, events</li>
+            <li>Entity page layout: header, summary, occurrences, connections, timeline</li>
+            <li>Populate Layer 2 (Understand) content: historical background, short explanations</li>
+            <li>Build <code>EntityTimeline</code> component (mini horizontal timeline)</li>
+            <li>Build <code>EntityConnections</code> (related entities as interactive chips)</li>
+            <li>Link entity pages from inspector panel and discovery cards</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-num">6</span>
+          <div class="phase-info">
+            <h3>Polish, QA &amp; MVP Release</h3>
+            <div class="meta">Sprint 6-7 &middot; Est. 1.5 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip chip-accent">Animations</span>
+            <span class="chip chip-accent">Performance</span>
+            <span class="chip">Error states</span>
+          </div>
+          <ul>
+            <li>Add Framer Motion for inspector slide, card hover, page transitions</li>
+            <li>Loading skeletons for all pages (passage, search, entity, profile)</li>
+            <li>Empty states for no results, no highlights, no bookmarks</li>
+            <li>Error boundaries per page with retry actions</li>
+            <li>Performance audit: SSR caching, Redis TTL tuning, bundle analysis</li>
+            <li>Responsive audit: test mobile, tablet, desktop breakpoints</li>
+            <li>Keyboard navigation: tab order, shortcuts for power users</li>
+            <li>MVP release to staging &rarr; production</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         SPRINT BREAKDOWN
+         ============================================================ -->
+    <section id="sprints">
+      <span class="badge badge-mvp">Build</span>
+      <h2>Sprint Breakdown (~10 weeks total)</h2>
+
+      <div class="sprint-grid">
+        <div class="sprint-card">
+          <h5>Sprint 0 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 1</span></h5>
+          <div class="tasks">
+            <span>Foundation</span>
+            <span>Next.js + NestJS init</span>
+            <span>Docker Compose setup</span>
+            <span>Design tokens</span>
+            <span>Layout shell (nav, sidebar)</span>
+            <span>CI pipeline</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 1 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 2</span></h5>
+          <div class="tasks">
+            <span>Seed Bible text (5 translations)</span>
+            <span>Passage API endpoint</span>
+            <span>PassagePage SSR</span>
+            <span>VerseList + VerseRow</span>
+            <span>TranslationSelector</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 2 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 3-4</span></h5>
+          <div class="tasks">
+            <span>ChapterNav + Breadcrumb</span>
+            <span>LayerPills component</span>
+            <span>Seed Neo4j entities</span>
+            <span>Entity API endpoint</span>
+            <span>InspectorPanel (basic)</span>
+            <span>Clickable word highlighting</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 3 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 4-5</span></h5>
+          <div class="tasks">
+            <span>InspectorPanel (full)</span>
+            <span>DiscoveryCardDeck</span>
+            <span>6 discovery card types</span>
+            <span>Passage layout responsive</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 4 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 5-6</span></h5>
+          <div class="tasks">
+            <span>Seed OpenSearch</span>
+            <span>Search API endpoint</span>
+            <span>SearchPage layout</span>
+            <span>SearchFilters</span>
+            <span>HomePage hero + grids</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 5 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 7-8</span></h5>
+          <div class="tasks">
+            <span>NextAuth Google + Apple</span>
+            <span>User API endpoints</span>
+            <span>Highlight system</span>
+            <span>Bookmark system</span>
+            <span>Notes (TipTap)</span>
+            <span>ProfilePage</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 6 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 8-9</span></h5>
+          <div class="tasks">
+            <span>EntityPage SSR</span>
+            <span>Layer 2 content</span>
+            <span>EntityTimeline</span>
+            <span>EntityConnections</span>
+            <span>Link inspector to entity pages</span>
+          </div>
+        </div>
+        <div class="sprint-card">
+          <h5>Sprint 7 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:400;">Week 10</span></h5>
+          <div class="tasks">
+            <span>Framer Motion animations</span>
+            <span>Loading/empty/error states</span>
+            <span>Performance audit</span>
+            <span>Responsive polish</span>
+            <span>Keyboard nav</span>
+            <span>MVP release</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Estimated total:</strong> ~10 weeks for a 2-person team (1 frontend, 1 full-stack). Single developer: add 40-60%.</p>
+        <p><strong>Risk factor — Bible text licensing:</strong> ESV and NRSV require licensing agreements. For MVP prototyping, use public domain translations (KJV, ASV, WEB) and add licensed texts later.</p>
+        <p><strong>Lexical data — fully open:</strong> The platform uses <strong>Macula Hebrew</strong> (morphology, clause structures), <strong>ETCBC</strong> (linguistic database of the Hebrew Bible), <strong>STEPBible</strong> (open lexical definitions and glosses), and <strong>Strong's</strong> (public domain). No licensed lexicons. All data is freely redistributable, auditable, and forkable.</p>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         POST-MVP ROADMAP
+         ============================================================ -->
+    <section id="postmvp">
+      <span class="badge badge-future">Roadmap</span>
+      <h2>Post-MVP Roadmap</h2>
+      <p>These features are intentionally deferred from the MVP. Each represents a substantial addition to the platform and is scoped as a separate initiative with its own design, implementation, and QA track.</p>
+
+      <div class="phase-card" id="postmvp-phase7">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">7</span>
+          <div class="phase-info">
+            <h3>Layer 3 &mdash; Explore</h3>
+            <div class="meta">v1.2 &middot; Est. 3-4 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">Hebrew/Greek inline</span>
+            <span class="chip">Lexicon deep-dive</span>
+            <span class="chip">Parallel passages</span>
+            <span class="chip">Reception history</span>
+            <span class="chip">Interactive timelines</span>
+          </div>
+          <ul>
+            <li><strong>Inline Hebrew/Greek:</strong> Toggle to display original language text alongside translation, with word-by-word glosses</li>
+            <li><strong>Lexicon deep-dive:</strong> Full lexicon view within the inspector panel — STEPBible definitions, ETCBC linguistic annotations, Macula Hebrew morphology, Strong's cross-references, all with open-source attribution</li>
+            <li><strong>Parallel passages:</strong> Automated detection of synoptic parallels (Gospels), intertextual allusions, and repeated formulas</li>
+            <li><strong>Reception history:</strong> How a passage was interpreted across centuries — patristic, medieval, Reformation, modern</li>
+            <li><strong>Interactive timeline:</strong> Basic clickable timeline per passage — key historical events, composition dates, manuscript landmarks</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase8">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">8</span>
+          <div class="phase-info">
+            <h3>Layer 4 &mdash; Research Tools</h3>
+            <div class="meta">v1.3 &middot; Est. 4-5 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">Textual criticism</span>
+            <span class="chip">Manuscript comparison</span>
+            <span class="chip">Source criticism</span>
+            <span class="chip">Variant readings</span>
+            <span class="chip">Citation graph</span>
+          </div>
+          <ul>
+            <li><strong>Variant readings viewer:</strong> Display textual variants from major manuscripts (Codex Sinaiticus, Vaticanus, Alexandrinus, Dead Sea Scrolls)</li>
+            <li><strong>Manuscript comparison:</strong> Side-by-side viewer comparing up to 4 manuscript witnesses for a given passage</li>
+            <li><strong>Source criticism layers:</strong> Highlight source traditions (J, E, D, P for Pentateuch; Q, M, L for Gospels)</li>
+            <li><strong>Citation graph:</strong> Visual citation network — which passages quote which, with direction, frequency, and theological weight</li>
+            <li><strong>Scholarly debate summaries:</strong> Curated summaries of major scholarly debates tied to specific passages, with pro/con evidence lists</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase9">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">9</span>
+          <div class="phase-info">
+            <h3>Knowledge Graph Visualization</h3>
+            <div class="meta">v1.4 &middot; Est. 3-4 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">React Flow</span>
+            <span class="chip">Force-directed layout</span>
+            <span class="chip">Node filtering</span>
+            <span class="chip">Relationship exploration</span>
+          </div>
+          <ul>
+            <li>Replace static entity pages with an interactive force-directed graph using React Flow</li>
+            <li>Node types: People, Places, Events, Concepts, Texts — each with distinct visual encoding</li>
+            <li>Click a node to see its connections animate; drag to rearrange; scroll to zoom</li>
+            <li>Filter sidebar: toggle entity types on/off, search within graph, highlight paths between two entities</li>
+            <li>Context panel appears on node selection with entity summary, key relationships, and link to full entity page</li>
+            <li>Persistent graph state via URL query params for sharing specific graph views</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase10">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">10</span>
+          <div class="phase-info">
+            <h3>Research Workspace</h3>
+            <div class="meta">v1.5 &middot; Est. 4-5 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">Multi-panel layout</span>
+            <span class="chip">Resizable panels</span>
+            <span class="chip">Persistent sessions</span>
+            <span class="chip">Export</span>
+          </div>
+          <ul>
+            <li>Full multi-panel desktop workspace with resizable panel grid (golden-layout or react-resizable-panels)</li>
+            <li>Available panels: Reading, Timeline, Graph, Sources, Notes, Lexicon, Maps, Comparison</li>
+            <li>Save workspace layout as a named session; restore on return; share read-only links</li>
+            <li>Drag-and-drop verses, entities, and sources between panels</li>
+            <li>Export workspace as PDF, Markdown, or plain text with citation formatting (SBL, Chicago, MLA)</li>
+            <li>Collaborative workspaces (future): shared sessions with real-time cursor presence</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase11">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">11</span>
+          <div class="phase-info">
+            <h3>Interactive Map Viewer</h3>
+            <div class="meta">v1.6 &middot; Est. 3-4 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">MapLibre GL</span>
+            <span class="chip">Historical map layers</span>
+            <span class="chip">Journey plotting</span>
+            <span class="chip">Archaeology markers</span>
+          </div>
+          <ul>
+            <li>MapLibre GL with historical map tile layers (ancient coastlines, shifted political borders)</li>
+            <li>Key layers: Kingdoms &amp; empires over time, trade routes, patriarch journeys, exodus route, Paul's missionary journeys</li>
+            <li>Time slider: move through centuries and watch borders shift, empires rise and fall</li>
+            <li>Archaeological site markers with popup summaries, linked to entity pages</li>
+            <li>Passage-linked map mode: reading Genesis 14? Show the locations of the four kings on the map</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase12">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">12</span>
+          <div class="phase-info">
+            <h3>AI Assistant &amp; Question Answering</h3>
+            <div class="meta">v2.0 &middot; Est. 5-6 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">LLM integration</span>
+            <span class="chip">RAG over knowledge graph</span>
+            <span class="chip">Source-grounded answers</span>
+            <span class="chip">Citation generation</span>
+          </div>
+          <ul>
+            <li>Integrate LLM (GPT-4o or open-weight alternative) with Retrieval-Augmented Generation over the knowledge graph</li>
+            <li>AI answers cite specific passages, manuscripts, and scholarly sources — never invents</li>
+            <li>Question explorer: AI suggests follow-up questions based on current passage or search context</li>
+            <li>Compare interpretations: "How do Augustinian and Pelagian readings of Romans 5 differ?"</li>
+            <li>Source transparency panel: every AI response shows the evidence used, with relevance scores</li>
+            <li>AI is explicitly framed as a research assistant, not an authority — "Based on the available evidence..."</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase13">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">13</span>
+          <div class="phase-info">
+            <h3>Community &amp; Social Features</h3>
+            <div class="meta">v2.1 &middot; Est. 3-4 weeks</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">Public annotations</span>
+            <span class="chip">Collections</span>
+            <span class="chip">Shared workspaces</span>
+            <span class="chip">Following</span>
+          </div>
+          <ul>
+            <li><strong>Public annotations:</strong> Users can publish notes and highlights for community visibility (opt-in per note)</li>
+            <li><strong>Collections:</strong> Curated reading lists — "Christological Psalms," "Exodus Motif in the Prophets" — with collaborative editing</li>
+            <li><strong>Scholarly profiles:</strong> Researcher profiles with publication lists, areas of expertise, and public annotations</li>
+            <li><strong>Following:</strong> Follow scholars or curators to see their public annotations in your feed</li>
+            <li><strong>Discussion threads:</strong> Passage-level discussion with threading, labels (Question, Insight, Resource)</li>
+            <li><strong>Citation export:</strong> One-click bibliography export for any passage or collection</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-card" id="postmvp-phase14">
+        <div class="phase-header">
+          <span class="phase-num" style="color:var(--muted-copper);">14</span>
+          <div class="phase-info">
+            <h3>Platform &amp; Experience Depth</h3>
+            <div class="meta">v2.2+ &middot; Est. ongoing</div>
+          </div>
+        </div>
+        <div class="phase-body">
+          <div class="stack" style="margin-bottom:var(--space-2);">
+            <span class="chip">Command palette</span>
+            <span class="chip">Offline PWA</span>
+            <span class="chip">Mobile apps</span>
+            <span class="chip">API for researchers</span>
+          </div>
+          <ul>
+            <li><strong>Command palette:</strong> Cmd+K global palette for navigation, actions, search — inspired by Linear</li>
+            <li><strong>Offline PWA:</strong> Service worker with cached passages and entities for offline reading and note-taking</li>
+            <li><strong>Native mobile apps:</strong> React Native or Swift/Kotlin wrappers for App Store and Play Store with native gestures</li>
+            <li><strong>Public API:</strong> REST + GraphQL API for researchers, with rate limits, API keys, and academic access tiers</li>
+            <li><strong>Dark mode:</strong> Full dark theme with warm desaturated tones (not harsh black/white)</li>
+            <li><strong>Internationalization:</strong> UI in English, Spanish, German, French, Portuguese — content in original languages + translation</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Total post-MVP estimate:</strong> ~30-40 weeks for a 2-person team. The roadmap is ordered by user impact vs. complexity — Layer 3 and 4 deepen the core reading experience, visualization makes the knowledge graph tangible, and the workspace turns the platform into a research tool.</p>
+        <p style="margin-top:var(--space-2);"><strong>AI feature timing note:</strong> The AI assistant is deliberately placed at v2.0, after the knowledge graph, content layers, and workspace are mature. This ensures AI responses have a rich, verified knowledge base to draw from rather than generating shallow answers over thin data.</p>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         KEY DECISIONS
+         ============================================================ -->
+    <section id="decisions">
+      <span class="badge badge-mvp">Build</span>
+      <h2>Key Technical Decisions</h2>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">SSR for passages, CSR for search</div>
+          <p>Passage pages are server-rendered for SEO and instant content. Search pages are client-rendered for interactive filtering and real-time results.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Translations stored per-verse in MongoDB</div>
+          <p>Each verse document holds all translation strings. This avoids N+1 query patterns when switching translations and enables multi-translation display.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Neo4j for entity graph, not MongoDB</div>
+          <p>The entity graph is deeply interconnected (people mentioned in passages, related to concepts, located in places). Neo4j makes these traversals a single query vs. multiple MongoDB joins.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">OpenSearch for full-text search, not MongoDB Atlas Search</div>
+          <p>OpenSearch provides superior Hebrew/Greek stemming, fuzzy matching, and relevance tuning. The infrastructure cost is justified by search quality for ancient languages.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Inspector panel via client-side fetch, not SSR</div>
+          <p>Loading entity data on demand (when a user clicks a word) avoids preloading the entire entity graph on every passage page. Use TanStack Query with prefetching for common words.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Redis as read-through cache layer</div>
+          <p>Passage and entity data is relatively static (changes only with translation updates). Redis caches API responses with TTL. Invalidate on translation data update events.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Design tokens as CSS custom properties</div>
+          <p>All colors, spacing, radii, shadows, and typography are defined as CSS variables in a single <code>tokens.css</code>. Both Tailwind and shadcn/ui consume these tokens. No hardcoded values.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Mobile-first responsive layout</div>
+          <p>Passage page uses a single-column layout on mobile, two-column on tablet+, sidebar on desktop. Inspector panel becomes a bottom sheet on mobile.</p>
+        </div>
+        <div class="card" style="border-color:var(--olive);background:rgba(122,139,111,0.04);">
+          <div class="card-title">Open lexical data stack — no licensed lexicons</div>
+          <p>The platform uses <strong>Macula Hebrew</strong> (morphology, clause-level annotations), <strong>ETCBC</strong> (comprehensive linguistic database of the Hebrew Bible), <strong>STEPBible</strong> (open lexical definitions with glosses and frequency data), and <strong>Strong's</strong> (public domain). Together they replace BDB, HALOT, and TWOT — zero licensing cost, fully auditable, community-maintained. Data is ingested via ETL scripts and stored in Neo4j for entity-based queries and MongoDB for verse-level word lookups.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         DEPENDENCIES
+         ============================================================ -->
+    <section id="deps">
+      <span class="badge badge-mvp">Reference</span>
+      <h2>Dependency Map</h2>
+
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <div class="card-title">MVP Phase Dependencies</div>
+        <div class="dep-row">
+          <span class="chip chip-accent">Ph 0: Foundation</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip">Ph 1: Reading</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip">Ph 2: Inspector</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip">Ph 5: Entity Pages</span>
+        </div>
+        <div class="dep-row" style="padding-left:100px;">
+          <span class="chip">Ph 3: Search</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-olive">(parallel to Ph 2)</span>
+        </div>
+        <div class="dep-row" style="padding-left:100px;">
+          <span class="chip">Ph 4: Auth</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-olive">(parallel to Ph 3, feeds Ph 6)</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <div class="card-title">Post-MVP Phase Dependencies</div>
+        <div class="dep-row">
+          <span class="chip chip-accent" style="border-color:var(--muted-copper);">Ph 7: Layer 3</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-accent" style="border-color:var(--muted-copper);">Ph 8: Layer 4</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-accent" style="border-color:var(--muted-copper);">Ph 12: AI</span>
+        </div>
+        <div class="dep-row" style="padding-left:85px;">
+          <span class="chip" style="border-color:var(--muted-copper);color:var(--muted-copper);">Ph 9: KG Viz</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip" style="border-color:var(--muted-copper);color:var(--muted-copper);">Ph 10: Workspace</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip" style="border-color:var(--muted-copper);color:var(--muted-copper);">Ph 13: Community</span>
+        </div>
+        <div class="dep-row" style="padding-left:85px;">
+          <span class="chip chip-olive">Ph 11: Maps</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-olive">(independent, needs Ph 1 for passage linking)</span>
+        </div>
+        <div class="dep-row" style="padding-left:85px;">
+          <span class="chip chip-olive">Ph 14: Platform</span>
+          <span class="arrow">&rarr;</span>
+          <span class="chip chip-olive">(feeds all — PWA, API, i18n, dark mode)</span>
+        </div>
+        <div class="dep-row" style="padding-left:85px;margin-top:var(--space-2);font-size:0.82rem;color:var(--text-muted);">
+          <span>Ph 5 (Entity Pages) + Ph 9 (KG Viz) = foundation for Ph 12 (AI RAG)</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">External Dependencies</div>
+        <table class="route-table" style="margin:0;">
+          <thead>
+            <tr><th>Dependency</th><th>Why</th><th>Phase</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bible text data (5+ translations)</td>
+              <td>Core content — every feature depends on this</td>
+              <td><span class="chip chip-sm chip-accent">MVP</span></td>
+              <td><span class="chip chip-sm">Needs sourcing</span></td>
+            </tr>
+            <tr>
+              <td>Hebrew/Greek word data (Macula Hebrew + ETCBC + Strong's)</td>
+              <td>Inspector panel lexicon + Layer 3 — all open access, no licensing fees</td>
+              <td><span class="chip chip-sm chip-accent">MVP</span></td>
+              <td><span class="chip chip-sm">Available (open)</span></td>
+            </tr>
+            <tr>
+              <td>Google OAuth credentials</td>
+              <td>Authentication provider</td>
+              <td><span class="chip chip-sm chip-accent">MVP</span></td>
+              <td><span class="chip chip-sm">Needs setup</span></td>
+            </tr>
+            <tr>
+              <td>Apple OAuth credentials</td>
+              <td>Authentication provider</td>
+              <td><span class="chip chip-sm chip-accent">MVP</span></td>
+              <td><span class="chip chip-sm">Needs setup</span></td>
+            </tr>
+            <tr>
+              <td>Entity knowledge base (people, places, concepts)</td>
+              <td>Inspector panel, discovery cards, entity pages</td>
+              <td><span class="chip chip-sm chip-accent">MVP</span></td>
+              <td><span class="chip chip-sm">Needs curation</span></td>
+            </tr>
+            <tr>
+              <td>Full lexicon data (STEPBible + ETCBC linguistic annotations)</td>
+              <td>Layer 3 lexicon deep-dive in inspector — replaces BDB/HALOT/TWOT with open resources</td>
+              <td><span class="chip chip-sm chip-olive">v1.2</span></td>
+              <td><span class="chip chip-sm">Available (open)</span></td>
+            </tr>
+            <tr>
+              <td>Manuscript transcriptions (Sinaiticus, Vaticanus, etc.)</td>
+              <td>Layer 4 variant readings + comparison viewer</td>
+              <td><span class="chip chip-sm chip-olive">v1.3</span></td>
+              <td><span class="chip chip-sm">Public domain (most)</span></td>
+            </tr>
+            <tr>
+              <td>Scholarly citation database</td>
+              <td>Layer 4 citation graph + academic references</td>
+              <td><span class="chip chip-sm chip-olive">v1.3</span></td>
+              <td><span class="chip chip-sm">Needs curation</span></td>
+            </tr>
+            <tr>
+              <td>Maps tile server (historical map layers)</td>
+              <td>Map viewer with ancient coastlines, borders</td>
+              <td><span class="chip chip-sm chip-olive">v1.6</span></td>
+              <td><span class="chip chip-sm">Needs sourcing</span></td>
+            </tr>
+            <tr>
+              <td>LLM API key (GPT-4o or open-weight)</td>
+              <td>AI assistant with RAG over knowledge graph</td>
+              <td><span class="chip chip-sm chip-olive">v2.0</span></td>
+              <td><span class="chip chip-sm">Needs setup</span></td>
+            </tr>
+            <tr>
+              <td>PDL library / metadata service</td>
+              <td>Biblical literature metadata for semantic enrichment</td>
+              <td><span class="chip chip-sm">Ongoing</span></td>
+              <td><span class="chip chip-sm">Researching</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- ============================================================
+         DATABASE SCHEMA
+         ============================================================ -->
+    <section id="schema">
+      <span class="badge badge-mvp">Reference</span>
+      <h2>Database Schema</h2>
+      <p style="margin-bottom:var(--space-6);">MVP collections shown in full. Post-MVP additions marked with <span class="chip chip-sm chip-olive">v1.x</span>.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">MongoDB: <code>passages</code></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, book, chapter,
+  verses: [{
+    num: number,
+    translations: {
+      esv: string,
+      niv: string,
+      nrsv: string,
+      kjv: string,
+      nasb: string
+    },
+    words: [{
+      position: number,
+      surface: string,
+      strongs?: string,
+      hebrew?: string,
+      greek?: string
+    }]
+  }],
+  metadata: {
+    section: string,
+    genre: string,
+    date_range: string
+  },
+  // v1.2: reception_history, parallel_passages
+  // v1.3: variant_readings, source_criticism_labels
+  prev_chapter: { book, chapter }?,
+  next_chapter: { book, chapter }?
+}
+          </p>
+          <p style="margin-top:var(--space-2);">
+            Indexes: <code>{ book: 1, chapter: 1 }</code> unique,
+            <code>{ "verses.translations.esv": "text" }</code>
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Neo4j: Entity Graph</div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+(:Person { id, name, slug,
+  summary, birth_year?,
+  death_year? })
+
+(:Place { id, name, slug,
+  summary, lat?, lng?,
+  region? })
+
+(:Concept { id, name, slug,
+  summary, category })
+
+(:Event { id, name, slug,
+  summary, year?, year_end? })
+
+(:Text { id, name, slug,
+  summary, date_range? })
+
+// v1.4: (:Artifact), (:Kingdom)
+// v1.6: geo spatial index on Place
+
+(:Entity)-[:MENTIONED_IN {
+  passage_id, book, chapter,
+  verse_start, verse_end
+}]->(:Passage)
+
+(:Entity)-[:RELATED_TO {
+  relationship: string
+}]->(:Entity)
+
+// v1.3: (:Manuscript) -[:WITNESSES]->(:Passage)
+// v1.3: (:ScholarlySource) -[:DISCUSSES]->(:Passage)
+// v1.2: (:ReceptionWork) -[:INTERPRETS]->(:Passage)
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">OpenSearch: <code>passages</code> + <code>entities</code></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+// Index: passages
+{ book, chapter, verse,
+  text_esv, text_niv,
+  text_kjv, text_nrsv,
+  hebrew_text?,
+  greek_text?,
+  entities: [entityId],
+  // v1.2: reception_keywords,
+  // v1.3: variant_notes,
+  // v1.6: geo_locations
+}
+
+// Index: entities
+{ name, type,
+  name_hebrew?,
+  name_greek?,
+  aliases: [string],
+  summary }
+          </p>
+          <p style="margin-top:var(--space-2);">
+            Custom analyzer with Hebrew/Greek stemming and transliteration support.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>users</code></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id,
+  auth: [{ provider, provider_id }],
+  preferences: {
+    default_translation: "esv",
+    font_size: "md",
+    theme: "light"|"dark"
+  },
+  highlights: [{
+    passage_id, book, chapter,
+    verse_start, verse_end,
+    color, note?, created_at
+  }],
+  bookmarks: [{ passage_id, book,
+    chapter, label?, created_at }],
+  notes: [{ passage_id, verse_ref?,
+    content_rich, created_at,
+    updated_at }],
+  // v1.5: workspaces: [workspace_id]
+  // v2.1: public_profile, followers,
+  //       published_collections
+  created_at: Date
+}
+          </p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:var(--space-8);">Post-MVP Collections</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">MongoDB: <code>workspaces</code> <span class="chip chip-sm chip-olive">v1.5</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, owner_id: ObjectId,
+  name: string,
+  layout: {
+    panels: [{
+      type: "reading"|"graph"|"timeline"
+           |"sources"|"notes"|"lexicon"
+           |"maps"|"comparison",
+      position: { x, y, w, h }
+    }]
+  },
+  context: {
+    passage_id?,
+    entity_id?,
+    search_query?
+  },
+  // v2.1: collaborators: [user_id]
+  // v2.1: is_public: bool
+  created_at, updated_at
+}
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>collections</code> <span class="chip chip-sm chip-olive">v2.1</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, owner_id: ObjectId,
+  name: string,
+  description: string,
+  entries: [{
+    passage_id,
+    book, chapter,
+    verse_start?, verse_end?,
+    note?: string,
+    order: number
+  }],
+  tags: [string],
+  is_public: bool,
+  // collaborators: [user_id]
+  created_at, updated_at
+}
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>ai_responses</code> <span class="chip chip-sm chip-olive">v2.0</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, user_id: ObjectId?,
+  query: string,
+  context: {
+    passage_id?, book?,
+    chapter?, entity_id?
+  },
+  response_markdown: string,
+  sources: [{
+    type: "passage"|"entity"|"manuscript"
+         |"scholarly_work",
+    id: string,
+    relevance_score: float,
+    snippet: string
+  }],
+  follow_up_questions: [string],
+  model: string, // e.g. "gpt-4o"
+  created_at: Date,
+  // Indexed for audit + improvement
+  user_rating?: 1|0|-1
+}
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>annotations</code> <span class="chip chip-sm chip-olive">v2.1</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, user_id: ObjectId,
+  passage_id, book, chapter,
+  verse_start, verse_end?,
+  body_markdown: string,
+  is_public: bool,
+  tags: [string],
+  // thread_id? for discussions
+  created_at, updated_at
+}
+// Index: { passage_id, is_public }
+// Index: { user_id, is_public }
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>manuscripts</code> <span class="chip chip-sm chip-olive">v1.3</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, name: string,
+  siglum: string, // e.g. "&#8451;", "B"
+  date: string,   // e.g. "4th century"
+  material: "papyrus"|"parchment",
+  content: [{
+    book, chapter_start,
+    chapter_end,
+    verses_present: [int]
+  }],
+  transcription_source: string,
+  images: [{
+    url: string,
+    folio: string
+  }]  // stored in MinIO
+}
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">MongoDB: <code>api_keys</code> <span class="chip chip-sm chip-olive">v2.2</span></div>
+          <p style="font-family:var(--font-mono);font-size:0.78rem;white-space:pre;overflow-x:auto;">
+{ _id, user_id: ObjectId,
+  name: string,
+  key_hash: string,
+  scopes: [
+    "passages:read",
+    "entities:read",
+    "search"
+  ],
+  rate_limit: {
+    requests_per_min: number,
+    requests_per_day: number
+  },
+  last_used?: Date,
+  expires_at?: Date,
+  created_at: Date,
+  revoked: bool
+}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <footer style="padding:var(--space-8) 0;text-align:center;color:var(--text-muted);font-size:0.85rem;">
+      <p style="margin:0 auto;max-width:100%;">
+        Biblical Literature Explorer &mdash; Implementation Plan v1.1 &mdash; MVP
+      </p>
+      <p style="margin:var(--space-2) 0 0;max-width:100%;">
+        ~10 weeks &middot; 7 sprints &middot; 4 data stores &middot; 40+ components
+      </p>
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>
