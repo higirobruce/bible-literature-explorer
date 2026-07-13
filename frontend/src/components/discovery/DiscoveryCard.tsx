@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Star, BookOpen, Users, MapPin, HelpCircle, type LucideIcon } from "lucide-react";
 
@@ -6,6 +9,7 @@ interface DiscoveryCardProps {
   description: string;
   icon: string;
   variant?: "default" | "ancient" | "literature" | "people" | "places" | "question";
+  index?: number;
 }
 
 const variantStyles: Record<string, string> = {
@@ -34,19 +38,23 @@ const iconMap: Record<string, LucideIcon> = {
   "help-circle": HelpCircle,
 };
 
-export function DiscoveryCard({ title, description, icon, variant = "default" }: DiscoveryCardProps) {
+export function DiscoveryCard({ title, description, icon, variant = "default", index = 0 }: DiscoveryCardProps) {
   const Icon = iconMap[icon] ?? HelpCircle;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, delay: index * 0.08, ease: [0.25, 0.1, 0.25, 1] }}
+      whileHover={{ y: -4, boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}
       className={cn(
-        "min-w-[240px] max-w-[280px] shrink-0 rounded-lg border bg-card p-4 shadow-sm transition-all duration-150 ease-out cursor-pointer hover:shadow-md",
+        "min-w-[240px] max-w-[280px] shrink-0 rounded-lg border bg-card p-4 shadow-sm transition-colors duration-150 ease-out cursor-pointer",
         variantStyles[variant]
       )}
     >
       <Icon className={cn("h-5 w-5", iconVariantStyles[variant])} />
       <h4 className="mt-2 text-sm font-medium text-heading">{title}</h4>
       <p className="mt-1 text-xs text-secondary leading-relaxed">{description}</p>
-    </div>
+    </motion.div>
   );
 }

@@ -21,8 +21,8 @@ export function VerseList({ verses, onWordClick }: VerseListProps) {
 
   return (
     <div className="space-y-2">
-      {verses.map((verse) => (
-        <VerseRow key={verse.num} num={verse.num} text={verse.text} onWordClick={onWordClick} />
+      {verses.map((verse, i) => (
+        <VerseRow key={verse.num} num={verse.num} text={verse.text} onWordClick={onWordClick} index={i} />
       ))}
     </div>
   );

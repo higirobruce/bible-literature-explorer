@@ -66,13 +66,14 @@ export function DiscoveryCardDeck() {
         Discoveries
       </h2>
       <div className="flex gap-3 overflow-x-auto pb-2">
-        {cards.map((card) => (
+        {cards.map((card, i) => (
           <DiscoveryCard
             key={card.title}
             title={card.title}
             description={card.description}
             icon={card.icon}
             variant={card.variant}
+            index={i}
           />
         ))}
       </div>

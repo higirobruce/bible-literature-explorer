@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { EntityConnections } from "@/components/entity/EntityConnections";
 import { EntityTimeline } from "@/components/entity/EntityTimeline";
+import { ErrorState } from "@/components/ui/error-state";
+import { EntitySkeleton } from "@/components/ui/skeleton";
+import { PageTransition } from "@/components/ui/page-transition";
 import { ArrowLeft } from "lucide-react";
 
 interface EntityPageProps {
@@ -21,7 +24,7 @@ interface EntityData {
   background: string;
   dateRange?: string;
   occurrences: { reference: string; text: string }[];
-  connections: { id: string; name: string; type: string; relationship: string }[];
+  connections: { id: string; name: string; type: string; relationship: string; slug?: string }[];
   timeline: { date: string; label: string }[];
 }
 
@@ -29,38 +32,44 @@ export default function EntityPage({ params }: EntityPageProps) {
   const { type, slug } = params;
   const [entity, setEntity] = useState<EntityData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchEntity = useCallback(() => {
+    setLoading(true);
+    setError(null);
     fetch(`http://localhost:4000/api/entities/${type}/${slug}`)
-      .then((r) => r.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Entity not found");
+        return res.json();
+      })
       .then((data) => {
         setEntity(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
   }, [type, slug]);
 
-  if (loading) {
-    return (
-      <div className="space-y-4 animate-pulse">
-        <div className="h-8 w-48 rounded bg-muted/30" />
-        <div className="h-4 w-full rounded bg-muted/30" />
-        <div className="h-4 w-3/4 rounded bg-muted/30" />
-        <div className="mt-6 h-32 rounded bg-muted/30" />
-      </div>
-    );
-  }
+  useEffect(() => { fetchEntity(); }, [fetchEntity]);
 
-  if (!entity) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-muted">Entity not found.</p>
-      </div>
-    );
-  }
+  if (loading) return <PageTransition><EntitySkeleton /></PageTransition>;
+
+  if (error) return (
+    <PageTransition>
+      <ErrorState title="Failed to load entity" message={error} onRetry={fetchEntity} />
+    </PageTransition>
+  );
+
+  if (!entity) return (
+    <PageTransition>
+      <ErrorState title="Entity not found" message={`No ${type} found with the slug "${slug}".`} />
+    </PageTransition>
+  );
 
   return (
-    <div className="space-y-8">
+    <PageTransition className="space-y-8">
       <Link
         href="/explore"
         className="flex items-center gap-1.5 text-xs text-muted hover:text-accent transition-colors"
@@ -102,9 +111,12 @@ export default function EntityPage({ params }: EntityPageProps) {
           Occurrences
         </h2>
         <div className="space-y-2">
+          {entity.occurrences.length === 0 && (
+            <p className="text-sm text-muted">No occurrences listed.</p>
+          )}
           {entity.occurrences.map((occ) => {
             const [book, ref] = occ.reference.split(" ");
-            const [ch, v] = (ref ?? "1").split(":");
+            const [ch] = (ref ?? "1").split(":");
             return (
               <Link
                 key={occ.reference}
@@ -120,6 +132,6 @@ export default function EntityPage({ params }: EntityPageProps) {
       </section>
 
       <EntityConnections connections={entity.connections} />
-    </div>
+    </PageTransition>
   );
 }

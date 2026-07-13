@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Highlighter } from "@/components/auth/Highlighter";
+import { Bookmark } from "lucide-react";
 
 interface VerseRowProps {
   num: number;
@@ -10,13 +12,17 @@ interface VerseRowProps {
   highlighted?: string | null;
   onWordClick?: (word: string) => void;
   onHighlight?: (verseNum: number, color: string) => void;
+  index?: number;
 }
 
-export function VerseRow({ num, text, highlighted, onWordClick, onHighlight }: VerseRowProps) {
+export function VerseRow({ num, text, highlighted, onWordClick, onHighlight, index = 0 }: VerseRowProps) {
   const [bookmarked, setBookmarked] = useState(false);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: index * 0.03, ease: [0.25, 0.1, 0.25, 1] }}
       className={cn(
         "group flex gap-3 rounded-md px-2 py-1.5 transition-colors duration-150 ease-out",
         highlighted && "bg-accent-subtle/40"
@@ -49,10 +55,11 @@ export function VerseRow({ num, text, highlighted, onWordClick, onHighlight }: V
         )}
         title={bookmarked ? "Remove bookmark" : "Bookmark verse"}
       >
-        <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-        </svg>
+        <Bookmark
+          className="h-3.5 w-3.5"
+          fill={bookmarked ? "currentColor" : "none"}
+        />
       </button>
-    </div>
+    </motion.div>
   );
 }

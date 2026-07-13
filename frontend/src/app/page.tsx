@@ -3,12 +3,12 @@ import { TopicGrid } from "@/components/home/TopicGrid";
 import { ContinueReading } from "@/components/home/ContinueReading";
 
 const topics = [
-  { name: "People", href: "#" },
-  { name: "Places", href: "#" },
+  { name: "People", href: "/explore" },
+  { name: "Places", href: "/explore" },
   { name: "Timeline", href: "#" },
   { name: "Maps", href: "#" },
-  { name: "Texts", href: "#" },
-  { name: "Concepts", href: "#" },
+  { name: "Texts", href: "/passage/genesis/1" },
+  { name: "Concepts", href: "/explore" },
   { name: "Manuscripts", href: "#" },
 ];
 

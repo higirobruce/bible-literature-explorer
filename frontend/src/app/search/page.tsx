@@ -5,7 +5,10 @@ import { SearchInput } from "@/components/search/SearchInput";
 import { SummaryCard } from "@/components/search/SummaryCard";
 import { EvidenceList } from "@/components/search/EvidenceList";
 import { QuickFacts } from "@/components/search/QuickFacts";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageTransition } from "@/components/ui/page-transition";
 import { cn } from "@/lib/utils";
+import { SearchX } from "lucide-react";
 
 interface SearchResult {
   book: string;
@@ -49,7 +52,7 @@ export default function SearchPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-medium text-heading">
           Search
@@ -95,31 +98,30 @@ export default function SearchPage() {
               {mockResults.length} result{mockResults.length !== 1 ? "s" : ""} for &ldquo;{query}&rdquo;
             </p>
           )}
-          {query ? (
-            mockResults.map((r, i) => (
-              <SummaryCard key={i} {...r} />
-            ))
-          ) : (
-            <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-border bg-card">
-              <p className="text-sm text-muted">
-                Enter a search term to find passages, people, places, and concepts.
-              </p>
-            </div>
+          {!query && (
+            <EmptyState
+              icon={SearchX}
+              title="Search the library"
+              description="Enter a search term to find passages, people, places, and concepts."
+            />
           )}
           {query && mockResults.length === 0 && (
-            <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-border bg-card">
-              <p className="text-sm text-muted">
-                No results found for &ldquo;{query}&rdquo;
-              </p>
-            </div>
+            <EmptyState
+              icon={SearchX}
+              title="No results found"
+              description={`No results found for "${query}". Try a different term.`}
+            />
           )}
+          {query && mockResults.length > 0 && mockResults.map((r, i) => (
+            <SummaryCard key={i} {...r} />
+          ))}
         </div>
 
         <aside className="space-y-6">
-          {query && <EvidenceList />}
-          {query && <QuickFacts />}
+          {query && mockResults.length > 0 && <EvidenceList />}
+          {query && mockResults.length > 0 && <QuickFacts />}
         </aside>
       </div>
-    </div>
+    </PageTransition>
   );
 }
