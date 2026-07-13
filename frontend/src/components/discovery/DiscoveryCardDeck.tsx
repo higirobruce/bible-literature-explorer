@@ -1,39 +1,65 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { DiscoveryCard } from "./DiscoveryCard";
 
-const cards = [
-  {
-    title: "ANE Cosmology",
-    description: "The ancient Near Eastern view of a dome-shaped firmament separating waters above from waters below — shared with Mesopotamian cosmology.",
-    icon: "\u2606",
-    variant: "ancient" as const,
-  },
-  {
-    title: "Enuma Elish",
-    description: "The Babylonian creation epic (c. 1750 BC) shares structural parallels with Genesis 1: order from chaos, divine speech, celestial bodies.",
-    icon: "\u2630",
-    variant: "literature" as const,
-  },
-  {
-    title: "Connected to: Abraham",
-    description: "The God who creates in Genesis 1 is the same God who calls Abraham in Genesis 12 — establishing a covenantal framework.",
-    icon: "\u263C",
-    variant: "people" as const,
-  },
-  {
-    title: "Location: Mesopotamia",
-    description: "The setting of Genesis 1-11 reflects Mesopotamian geography — the Tigris-Euphrates river system.",
-    icon: "\u2601",
-    variant: "places" as const,
-  },
-  {
-    title: "Why \"Let us\"?",
-    description: "The plural \"Let us make man\" has been interpreted as divine council, royal plural, or Trinity — a major interpretive question.",
-    icon: "?",
-    variant: "question" as const,
-  },
-];
+interface CardData {
+  title: string;
+  description: string;
+  icon: string;
+  variant: "default" | "ancient" | "literature" | "people" | "places" | "question";
+}
+
+interface DiscoveryResponse {
+  cards: CardData[];
+  passageId: string;
+}
 
 export function DiscoveryCardDeck() {
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const pathParts = window.location.pathname.split("/");
+    const book = pathParts[2] ?? "genesis";
+    const chapter = pathParts[3] ?? "1";
+    const passageId = `${book}-${chapter}`;
+
+    fetch(`http://localhost:4000/api/discovery/${passageId}`)
+      .then((res) => res.json())
+      .then((data: DiscoveryResponse) => {
+        setCards(data.cards);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <section>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+          Discoveries
+        </h2>
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="min-w-[240px] max-w-[280px] shrink-0 animate-pulse rounded-lg border border-border bg-card p-4"
+            >
+              <div className="h-5 w-5 rounded bg-muted/30" />
+              <div className="mt-2 h-4 w-3/4 rounded bg-muted/30" />
+              <div className="mt-1 h-3 w-full rounded bg-muted/30" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (cards.length === 0) return null;
+
   return (
     <section>
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">

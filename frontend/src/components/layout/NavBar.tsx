@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Search, User, BookOpen } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -19,9 +20,10 @@ export function NavBar() {
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6">
         <Link
           href="/"
-          className="font-heading text-lg font-medium text-heading"
+          className="flex items-center gap-2 font-heading text-lg font-medium text-heading"
         >
-          BLE
+          <BookOpen className="h-5 w-5 text-accent" />
+          <span>BLE</span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -43,15 +45,19 @@ export function NavBar() {
 
         <div className="flex-1" />
 
-        <button className="text-secondary hover:text-heading transition-colors duration-150 ease-out text-lg">
-          &#128269;
-        </button>
+        <Link
+          href="/search"
+          className="text-secondary hover:text-heading transition-colors duration-150 ease-out"
+        >
+          <Search className="h-4 w-4" />
+        </Link>
 
         <Link
           href="/profile"
-          className="text-sm font-medium text-secondary hover:text-heading transition-colors duration-150 ease-out"
+          className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-heading transition-colors duration-150 ease-out"
         >
-          Sign in
+          <User className="h-4 w-4" />
+          <span className="hidden sm:inline">Sign in</span>
         </Link>
       </div>
     </header>

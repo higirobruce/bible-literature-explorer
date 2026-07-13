@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Star, BookOpen, Users, MapPin, HelpCircle, type LucideIcon } from "lucide-react";
 
 interface DiscoveryCardProps {
   title: string;
@@ -16,7 +17,26 @@ const variantStyles: Record<string, string> = {
   question: "border-muted-copper/20 hover:border-muted-copper/40",
 };
 
+const iconVariantStyles: Record<string, string> = {
+  default: "text-accent",
+  ancient: "text-terracotta",
+  literature: "text-olive",
+  people: "text-deep-indigo",
+  places: "text-sand",
+  question: "text-muted-copper",
+};
+
+const iconMap: Record<string, LucideIcon> = {
+  star: Star,
+  "book-open": BookOpen,
+  users: Users,
+  "map-pin": MapPin,
+  "help-circle": HelpCircle,
+};
+
 export function DiscoveryCard({ title, description, icon, variant = "default" }: DiscoveryCardProps) {
+  const Icon = iconMap[icon] ?? HelpCircle;
+
   return (
     <div
       className={cn(
@@ -24,7 +44,7 @@ export function DiscoveryCard({ title, description, icon, variant = "default" }:
         variantStyles[variant]
       )}
     >
-      <span className="text-lg">{icon}</span>
+      <Icon className={cn("h-5 w-5", iconVariantStyles[variant])} />
       <h4 className="mt-2 text-sm font-medium text-heading">{title}</h4>
       <p className="mt-1 text-xs text-secondary leading-relaxed">{description}</p>
     </div>
