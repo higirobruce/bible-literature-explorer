@@ -71,20 +71,8 @@ export default function PassagePage({ params }: PassagePageProps) {
 
   const handleWordClick = useCallback((word: string) => {
     const cleaned = word.replace(/[^a-zA-Z]/g, "").toLowerCase();
-    let strongs: string | undefined;
-
-    for (const verse of verses) {
-      if (verse.words) {
-        const wordAtPosition = verse.words.find((w) => w.strongs);
-        if (wordAtPosition?.strongs) {
-          strongs = wordAtPosition.strongs;
-          break;
-        }
-      }
-    }
-
-    setSelectedWord({ word: cleaned, strongs });
-  }, [verses]);
+    setSelectedWord({ word: cleaned });
+  }, []);
 
   return (
     <PageTransition className="space-y-6">

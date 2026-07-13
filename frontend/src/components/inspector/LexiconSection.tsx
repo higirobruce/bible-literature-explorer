@@ -23,19 +23,34 @@ interface LexiconData {
 export function LexiconSection({ word, strongsNumber }: LexiconSectionProps) {
   const [data, setData] = useState<LexiconData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!word) return;
-    if (strongsNumber) {
-      setLoading(true);
-      fetch(`http://localhost:4000/api/lexicon/${strongsNumber}`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (!d.error) setData(d);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
+    setLoading(true);
+    setNotFound(false);
+    setData(null);
+
+    const url = strongsNumber
+      ? `http://localhost:4000/api/lexicon/${strongsNumber}`
+      : `http://localhost:4000/api/lexicon?q=${word}`;
+
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d) && d.length > 0) {
+          setData(d[0]);
+        } else if (!d.error) {
+          setData(d);
+        } else {
+          setNotFound(true);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setNotFound(true);
+        setLoading(false);
+      });
   }, [word, strongsNumber]);
 
   return (
@@ -88,17 +103,10 @@ export function LexiconSection({ word, strongsNumber }: LexiconSectionProps) {
           </div>
         </div>
       )}
-      {!loading && !data && !strongsNumber && (
+      {!loading && notFound && (
         <div className="rounded-lg border border-border bg-card p-3">
           <p className="text-xs text-muted">
             No lexical data available for &ldquo;{word}&rdquo;.
-          </p>
-        </div>
-      )}
-      {!loading && !data && strongsNumber && (
-        <div className="rounded-lg border border-border bg-card p-3">
-          <p className="text-xs text-muted">
-            Loading lexical data for Strong&apos;s {strongsNumber}...
           </p>
         </div>
       )}
