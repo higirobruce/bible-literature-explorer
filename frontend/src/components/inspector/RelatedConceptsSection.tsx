@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface RelatedConceptsSectionProps {
@@ -5,10 +6,9 @@ interface RelatedConceptsSectionProps {
 }
 
 const related = [
-  { name: "Creation", type: "Concept" },
-  { name: "Elohim", type: "Person" },
-  { name: "Genesis", type: "Text" },
-  { name: "Cosmology", type: "Concept" },
+  { name: "Creation", type: "Concept", slug: "creation" },
+  { name: "Elohim", type: "Person", slug: "elohim" },
+  { name: "Genesis", type: "Text", slug: "genesis" },
 ];
 
 export function RelatedConceptsSection({ word }: RelatedConceptsSectionProps) {
@@ -19,8 +19,9 @@ export function RelatedConceptsSection({ word }: RelatedConceptsSectionProps) {
       </h3>
       <div className="flex flex-wrap gap-1.5">
         {related.map((item) => (
-          <button
+          <Link
             key={item.name}
+            href={`/entity/${item.type.toLowerCase()}/${item.slug}`}
             className={cn(
               "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors duration-150 ease-out",
               item.type === "Person"
@@ -31,7 +32,7 @@ export function RelatedConceptsSection({ word }: RelatedConceptsSectionProps) {
             )}
           >
             {item.name}
-          </button>
+          </Link>
         ))}
       </div>
     </section>

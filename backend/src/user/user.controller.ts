@@ -6,17 +6,17 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('me')
-  getProfile(@Req() req) {
+  getProfile(@Req() req: any) {
     return this.userService.getProfile(req.userId ?? 'guest');
   }
 
   @Get('me/highlights')
-  getHighlights(@Req() req) {
+  getHighlights(@Req() req: any) {
     return this.userService.getHighlights(req.userId ?? 'guest');
   }
 
   @Post('me/highlights')
-  addHighlight(@Req() req, @Body() body: Record<string, string>) {
+  addHighlight(@Req() req: any, @Body() body: Record<string, string>) {
     return this.userService.addHighlight(req.userId ?? 'guest', {
       passageId: body.passageId,
       verseRange: body.verseRange,
@@ -25,32 +25,32 @@ export class UserController {
   }
 
   @Delete('me/highlights/:id')
-  removeHighlight(@Req() req, @Param('id') id: string) {
+  removeHighlight(@Req() req: any, @Param('id') id: string) {
     return this.userService.removeHighlight(req.userId ?? 'guest', id);
   }
 
   @Get('me/bookmarks')
-  getBookmarks(@Req() req) {
+  getBookmarks(@Req() req: any) {
     return this.userService.getBookmarks(req.userId ?? 'guest');
   }
 
   @Post('me/bookmarks')
-  addBookmark(@Req() req, @Body() body: Record<string, string>) {
+  addBookmark(@Req() req: any, @Body() body: Record<string, string>) {
     return this.userService.addBookmark(req.userId ?? 'guest', body.passageId);
   }
 
   @Delete('me/bookmarks/:passageId')
-  removeBookmark(@Req() req, @Param('passageId') passageId: string) {
+  removeBookmark(@Req() req: any, @Param('passageId') passageId: string) {
     return this.userService.removeBookmark(req.userId ?? 'guest', passageId);
   }
 
   @Get('me/notes')
-  getNotes(@Req() req) {
+  getNotes(@Req() req: any) {
     return this.userService.getNotes(req.userId ?? 'guest');
   }
 
   @Post('me/notes')
-  addNote(@Req() req, @Body() body: Record<string, string>) {
+  addNote(@Req() req: any, @Body() body: Record<string, string>) {
     return this.userService.addNote(req.userId ?? 'guest', {
       passageId: body.passageId,
       text: body.text,
@@ -58,7 +58,7 @@ export class UserController {
   }
 
   @Put('me/notes/:id')
-  updateNote(@Req() req, @Param('id') id: string, @Body() body: Record<string, string>) {
+  updateNote(@Req() req: any, @Param('id') id: string, @Body() body: Record<string, string>) {
     return this.userService.updateNote(req.userId ?? 'guest', id, body.text);
   }
 }

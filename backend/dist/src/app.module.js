@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const passages_module_1 = require("./passages/passages.module");
 const search_module_1 = require("./search/search.module");
 const discovery_module_1 = require("./discovery/discovery.module");
+const entities_module_1 = require("./entities/entities.module");
 const user_module_1 = require("./user/user.module");
 let AppModule = class AppModule {
 };
@@ -23,6 +24,7 @@ exports.AppModule = AppModule = __decorate([
             passages_module_1.PassagesModule,
             search_module_1.SearchModule,
             discovery_module_1.DiscoveryModule,
+            entities_module_1.EntitiesModule,
             user_module_1.UserModule,
         ],
     })
