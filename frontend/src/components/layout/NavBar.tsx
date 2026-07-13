@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { Search, User, BookOpen } from "lucide-react";
+import { Search, User, BookOpen, LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -14,6 +15,7 @@ const navItems = [
 
 export function NavBar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
@@ -52,13 +54,32 @@ export function NavBar() {
           <Search className="h-4 w-4" />
         </Link>
 
-        <Link
-          href="/profile"
-          className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-heading transition-colors duration-150 ease-out"
-        >
-          <User className="h-4 w-4" />
-          <span className="hidden sm:inline">Sign in</span>
-        </Link>
+        {session?.user ? (
+          <div className="flex items-center gap-3">
+            <Link
+              href="/profile"
+              className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-heading transition-colors duration-150 ease-out"
+            >
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">{session.user.name ?? "Profile"}</span>
+            </Link>
+            <button
+              onClick={() => signOut()}
+              className="text-muted hover:text-heading transition-colors duration-150 ease-out"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/profile"
+            className="flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-heading transition-colors duration-150 ease-out"
+          >
+            <User className="h-4 w-4" />
+            <span className="hidden sm:inline">Sign in</span>
+          </Link>
+        )}
       </div>
     </header>
   );

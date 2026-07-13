@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PassagesModule } from './passages/passages.module';
 import { SearchModule } from './search/search.module';
 import { DiscoveryModule } from './discovery/discovery.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { DiscoveryModule } from './discovery/discovery.module';
     PassagesModule,
     SearchModule,
     DiscoveryModule,
+    UserModule,
   ],
 })
 export class AppModule {}
