@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardTitle, CardDescription } from "@/components/ui/card";
+import { TopicGrid } from "@/components/home/TopicGrid";
+import { ContinueReading } from "@/components/home/ContinueReading";
 
 const topics = [
   { name: "People", href: "#" },
@@ -9,17 +10,6 @@ const topics = [
   { name: "Texts", href: "#" },
   { name: "Concepts", href: "#" },
   { name: "Manuscripts", href: "#" },
-];
-
-const quickLinks = [
-  { title: "Continue Reading", description: "Genesis 1:1-8" },
-  { title: "Today's Discovery", description: "Enuma Elish & Genesis" },
-  { title: "Explore Topics", description: "Covenant, Divine Council, Wisdom" },
-  { title: "Questions", description: "Who are the Nephilim?" },
-  { title: "People", description: "Abraham, Moses, David, Isaiah" },
-  { title: "Places", description: "Jerusalem, Babylon, Egypt, Nineveh" },
-  { title: "Historical Timeline", description: "1000 BC \u2014 586 BC \u2014 538 BC" },
-  { title: "Maps", description: "Fertile Crescent" },
 ];
 
 export default function HomePage() {
@@ -57,36 +47,9 @@ export default function HomePage() {
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {quickLinks.map((link) => (
-          <Card key={link.title} className="cursor-pointer">
-            <CardTitle className="text-sm font-medium">{link.title}</CardTitle>
-            <CardDescription className="mt-1 text-xs">
-              {link.description}
-            </CardDescription>
-          </Card>
-        ))}
-      </div>
+      <TopicGrid />
 
-      <section>
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-          Recent Activity
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Card>
-            <CardTitle className="text-sm">Research Workspace</CardTitle>
-            <CardDescription className="mt-1 text-xs">
-              Notes: Genesis 1-11 &middot; Comparison: 4 Gospels
-            </CardDescription>
-          </Card>
-          <Card>
-            <CardTitle className="text-sm">Collections</CardTitle>
-            <CardDescription className="mt-1 text-xs">
-              Messianic Prophecies &middot; Exodus Motif &middot; Wisdom Psalms
-            </CardDescription>
-          </Card>
-        </div>
-      </section>
+      <ContinueReading />
     </div>
   );
 }
