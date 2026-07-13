@@ -50,6 +50,21 @@ The platform explicitly avoids BDB, HALOT, TWOT, or any licensed lexical resourc
 6. **Ask before committing** unless explicitly told to commit.
 7. **Check this file** on every session startup for updated conventions.
 
+## Git Workflow (NON-NEGOTIABLE)
+The branching model is:
+
+```
+feature-branch -> dev -> main
+```
+
+Rules:
+- **Never commit directly to `main` or `dev`.** All changes must go through feature branches.
+- Feature branches are created from `dev`, named `feat/<description>` or `fix/<description>`.
+- Feature branches merge into `dev` — via CLI merge or direct push.
+- **`dev` to `main` must always go through a Pull Request on GitHub.** No exceptions. No CLI merges from `dev` to `main`.
+- PRs from `dev` to `main` require review before merging.
+- After a PR merge, sync `dev` from `main` (`git checkout dev && git merge main`).
+
 ## First Session Output
 Session 1 (Jul 13, 2026) produced:
 - Initial design system + product specification
