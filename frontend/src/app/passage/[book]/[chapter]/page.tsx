@@ -1,8 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import { VerseList } from "@/components/passage/VerseList";
 import { ChapterNav } from "@/components/passage/ChapterNav";
 import { Breadcrumb } from "@/components/passage/Breadcrumb";
 import { TranslationSelector } from "@/components/passage/TranslationSelector";
 import { LayerPills } from "@/components/passage/LayerPills";
+import { InspectorPanel } from "@/components/inspector/InspectorPanel";
+import { DiscoveryCardDeck } from "@/components/discovery/DiscoveryCardDeck";
 
 interface PassagePageProps {
   params: {
@@ -25,6 +30,7 @@ const mockVerses = [
 export default function PassagePage({ params }: PassagePageProps) {
   const { book, chapter } = params;
   const bookName = book.charAt(0).toUpperCase() + book.slice(1);
+  const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -41,9 +47,13 @@ export default function PassagePage({ params }: PassagePageProps) {
         </div>
       </div>
 
-      <VerseList verses={mockVerses} />
+      <VerseList verses={mockVerses} onWordClick={setSelectedWord} />
+
+      <DiscoveryCardDeck />
 
       <ChapterNav book={book} chapter={parseInt(chapter)} totalChapters={50} />
+
+      <InspectorPanel word={selectedWord} onClose={() => setSelectedWord(null)} />
     </div>
   );
 }
