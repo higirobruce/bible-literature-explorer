@@ -8,6 +8,8 @@ import { bibleChapters } from '../src/bible-data/genesis.data';
 import { psalm23 } from '../src/bible-data/psalms.data';
 import * as fs from 'fs';
 import * as path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const morphhb = require('morphhb');
 
 const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/ble';
 const DATA_DIR = path.resolve(__dirname, 'data');
@@ -162,15 +164,17 @@ function loadStrongsData(): StrongsEntry[] {
       const data = JSON.parse(raw);
       const arr = Array.isArray(data) ? data : [data];
       for (const item of arr) {
+        const get = (...keys: string[]) => { for (const k of keys) { const v = item[k]; if (v) return v; } return ''; };
+        const num = get('number', 'strongs', 'id');
         entries.push({
-          strongs: item.strongs ?? item.id ?? item.number ?? '',
-          lemma: item.lemma ?? item.word ?? item.lemma ?? '',
-          hebrew: item.hebrew ?? item.Hebrew ?? '',
-          greek: item.greek ?? item.Greek ?? '',
-          transliteration: item.transliteration ?? item.translit ?? item.pronunciation ?? '',
-          pronunciation: item.pronunciation ?? item.phonetic ?? item.transliteration ?? '',
-          partOfSpeech: item.partOfSpeech ?? item.pos ?? item.ofSpeech ?? '',
-          gloss: item.gloss ?? item.definition ?? item.meaning ?? '',
+          strongs: num,
+          lemma: get('lemma', 'word', 'number'),
+          hebrew: get('hebrew', 'Hebrew') || (num.startsWith('H') ? get('lemma') : ''),
+          greek: get('greek', 'Greek') || (num.startsWith('G') ? get('lemma') : ''),
+          transliteration: get('transliteration', 'translit', 'xlit', 'pronounce', 'pronunciation'),
+          pronunciation: get('pronunciation', 'phonetic', 'pronounce', 'transliteration'),
+          partOfSpeech: get('partOfSpeech', 'pos', 'ofSpeech'),
+          gloss: get('gloss', 'definition', 'description', 'meaning'),
           occurrences: item.occurrences ?? item.count ?? 0,
         });
       }
@@ -205,22 +209,73 @@ function loadMaculaAlignment(): Map<string, { position: number; hebrew: string; 
   return alignmentMap;
 }
 
-// ——— Apply Macula alignment to a chapter's verses ———
+// ——— Build word-level Strong's alignment from morphhb (Hebrew OT) ———
+const MORPHHB_BOOK_MAP: Record<string, string> = {
+  Genesis: 'gen', Exodus: 'exod', Leviticus: 'lev', Numbers: 'num', Deuteronomy: 'deut',
+  Joshua: 'josh', Judges: 'judg', Ruth: 'ruth',
+  'I Samuel': '1sam', 'II Samuel': '2sam',
+  'I Kings': '1kgs', 'II Kings': '2kgs',
+  'I Chronicles': '1chr', 'II Chronicles': '2chr',
+  Ezra: 'ezra', Nehemiah: 'neh', Esther: 'esth',
+  Job: 'job', Psalms: 'ps', Proverbs: 'prov', Ecclesiastes: 'eccl',
+  'Song of Solomon': 'song',
+  Isaiah: 'isa', Jeremiah: 'jer', Lamentations: 'lam', Ezekiel: 'ezek', Daniel: 'dan',
+  Hosea: 'hos', Joel: 'joel', Amos: 'amos', Obadiah: 'obad', Jonah: 'jonah',
+  Micah: 'mic', Nahum: 'nah', Habakkuk: 'hab', Zephaniah: 'zeph',
+  Haggai: 'hag', Zechariah: 'zech', Malachi: 'mal',
+};
+
+function buildMorphhbAlignment(): Map<string, { position: number; hebrew: string; strongs: string }[]> {
+  const map = new Map<string, { position: number; hebrew: string; strongs: string }[]>();
+  try {
+    const books = morphhb as Record<string, any[][]>;
+    for (const [engName, bid] of Object.entries(MORPHHB_BOOK_MAP)) {
+      const bookData = books[engName];
+      if (!Array.isArray(bookData)) continue;
+      bookData.forEach((chapter, ci) => {
+        const chapterNum = ci + 1;
+        if (!Array.isArray(chapter)) return;
+        chapter.forEach((verse, vi) => {
+          const verseNum = vi + 1;
+          if (!Array.isArray(verse)) return;
+          const words = (verse as any[][])
+            .map((w, position) => {
+              const strongsRaw = Array.isArray(w) ? w[1] : '';
+              const strongs = typeof strongsRaw === 'string' ? (strongsRaw.split('/').pop() ?? '').toUpperCase() : '';
+              const hebrew = Array.isArray(w) ? String(w[0]).replace(/\//g, '') : '';
+              return { position, hebrew, strongs };
+            })
+            .filter((w) => w.strongs.startsWith('H'));
+          if (words.length) map.set(`${bid}:${chapterNum}:${verseNum}`, words);
+        });
+      });
+    }
+  } catch (e) {
+    console.warn('  morphhb alignment unavailable:', (e as Error).message);
+  }
+  return map;
+}
 function applyWordAlignment(
   verses: BibleVerse[],
   book: string,
   chapter: number,
   alignment: Map<string, { position: number; hebrew: string; strongs: string }[]>,
+  strongsMap: Map<string, { transliteration: string; gloss: string }>,
 ) {
   for (const verse of verses) {
     const key = `${book}:${chapter}:${verse.num}`;
     const words = alignment.get(key);
     if (words && words.length > 0) {
-      verse.words = words.map(w => ({
-        position: w.position,
-        hebrew: w.hebrew,
-        strongs: w.strongs,
-      }));
+      verse.words = words.map(w => {
+        const meta = strongsMap.get(w.strongs);
+        return {
+          position: w.position,
+          hebrew: w.hebrew,
+          strongs: w.strongs,
+          transliteration: meta?.transliteration ?? '',
+          gloss: meta?.gloss ?? '',
+        };
+      });
     }
   }
 }
@@ -287,11 +342,25 @@ async function seed() {
 
   // Apply Macula Hebrew word alignment if available
   console.log('  Loading Strong\'s alignment data...');
-  const alignment = loadMaculaAlignment();
+  const alignment = new Map<string, { position: number; hebrew: string; strongs: string }[]>([
+    ...loadMaculaAlignment(),
+    ...buildMorphhbAlignment(),
+  ]);
+
+  // Load lexicon early so aligned words can be enriched with gloss/transliteration
+  let strongsEntries = loadStrongsData();
+  const strongsMap = new Map<string, { transliteration: string; gloss: string }>();
+  for (const e of strongsEntries) {
+    strongsMap.set(e.strongs.toUpperCase(), {
+      transliteration: e.transliteration,
+      gloss: e.gloss,
+    });
+  }
+
   if (alignment.size > 0) {
     console.log(`  Found ${alignment.size} verses with word-level alignment`);
     for (const ch of allChapters) {
-      applyWordAlignment(ch.verses, ch.book, ch.chapter, alignment);
+      applyWordAlignment(ch.verses, ch.book, ch.chapter, alignment, strongsMap);
     }
   }
 
@@ -304,7 +373,7 @@ async function seed() {
   console.log(`  Seeded ${passages.length} passages (${allChapters.length} chapter-translations)`);
 
   // ——— 2. LEXICON ———
-  let strongsEntries = loadStrongsData();
+  // strongsEntries already loaded above for word enrichment
 
   // Fallback: use embedded data
   if (strongsEntries.length === 0) {

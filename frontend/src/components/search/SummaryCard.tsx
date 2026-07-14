@@ -22,7 +22,7 @@ export function SummaryCard({
 
   return (
     <Link
-      href={`/passage/${book}/${chapter}`}
+      href={`/passage/${book}/${chapter}?verse=${verse}`}
       className={cn(
         "block rounded-lg border border-border bg-card p-4 shadow-sm transition-all duration-150 ease-out hover:border-accent/30 hover:shadow-md",
         className

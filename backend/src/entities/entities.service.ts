@@ -10,7 +10,10 @@ export class EntitiesService {
   ) {}
 
   async findByTypeAndSlug(type: string, slug: string) {
-    const entity = await this.entityModel.findOne({ type: type.toLowerCase(), slug: slug.toLowerCase() });
+    const entity = await this.entityModel.findOne({
+      type: { $regex: new RegExp(`^${type.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      slug: slug.toLowerCase(),
+    });
     if (!entity) {
       throw new NotFoundException(`Entity not found: ${type}/${slug}`);
     }
@@ -25,5 +28,13 @@ export class EntitiesService {
         { summary: { $regex: q, $options: 'i' } },
       ],
     }).limit(10).select('id name type slug').lean();
+  }
+
+  async findAll() {
+    return this.entityModel
+      .find()
+      .sort({ type: 1, name: 1 })
+      .select('id name type slug')
+      .lean();
   }
 }
