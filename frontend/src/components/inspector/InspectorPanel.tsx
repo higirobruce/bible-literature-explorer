@@ -11,10 +11,15 @@ import { X } from "lucide-react";
 interface InspectorPanelProps {
   word: string | null;
   strongsNumber?: string;
+  gloss?: string;
+  transliteration?: string;
+  pos?: string;
+  morph?: string;
+  lemma?: string;
   onClose: () => void;
 }
 
-export function InspectorPanel({ word, strongsNumber, onClose }: InspectorPanelProps) {
+export function InspectorPanel({ word, strongsNumber, gloss, transliteration, pos, morph, lemma, onClose }: InspectorPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,6 +75,43 @@ export function InspectorPanel({ word, strongsNumber, onClose }: InspectorPanelP
           >
             {word ? (
               <div className="space-y-6">
+                {(transliteration || gloss || pos || morph || lemma) && (
+                  <section>
+                    <h3 className="mb-2 font-heading text-xs font-semibold uppercase tracking-wider text-muted">Morphology</h3>
+                    <div className="space-y-1.5 rounded-lg border border-border bg-card p-3">
+                      {gloss && (
+                        <div className="flex justify-between">
+                          <span className="text-xs text-muted">Gloss</span>
+                          <span className="text-sm text-primary">{gloss}</span>
+                        </div>
+                      )}
+                      {transliteration && (
+                        <div className="flex justify-between">
+                          <span className="text-xs text-muted">Transliteration</span>
+                          <span className="text-sm text-primary italic">{transliteration}</span>
+                        </div>
+                      )}
+                      {lemma && (
+                        <div className="flex justify-between">
+                          <span className="text-xs text-muted">Lemma</span>
+                          <span className="text-sm text-primary" lang="he" dir="rtl">{lemma}</span>
+                        </div>
+                      )}
+                      {pos && (
+                        <div className="flex justify-between">
+                          <span className="text-xs text-muted">Part of Speech</span>
+                          <span className="text-sm text-primary">{pos}</span>
+                        </div>
+                      )}
+                      {morph && (
+                        <div className="flex justify-between">
+                          <span className="text-xs text-muted">Morphology</span>
+                          <span className="text-sm font-mono text-primary">{morph}</span>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                )}
                 <LexiconSection word={word} strongsNumber={strongsNumber} />
                 <RelatedConceptsSection word={word} />
                 <ConnectionsSection word={word} />

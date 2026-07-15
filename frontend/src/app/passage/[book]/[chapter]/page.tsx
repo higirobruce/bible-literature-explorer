@@ -8,6 +8,8 @@ import { ChapterNav } from "@/components/passage/ChapterNav";
 import { Breadcrumb } from "@/components/passage/Breadcrumb";
 import { TranslationSelector } from "@/components/passage/TranslationSelector";
 import { LayerPills } from "@/components/passage/LayerPills";
+import { PassageTimeline } from "@/components/passage/PassageTimeline";
+import { ParallelPassages } from "@/components/passage/ParallelPassages";
 import { InspectorPanel } from "@/components/inspector/InspectorPanel";
 import { DiscoveryCardDeck } from "@/components/discovery/DiscoveryCardDeck";
 import { ErrorState } from "@/components/ui/error-state";
@@ -31,6 +33,11 @@ interface WordData {
   hebrew?: string;
   greek?: string;
   strongs?: string;
+  transliteration?: string;
+  gloss?: string;
+  pos?: string;
+  morph?: string;
+  lemma?: string;
 }
 
 interface Verse {
@@ -43,6 +50,11 @@ interface Verse {
 interface SelectedWord {
   word: string;
   strongs?: string;
+  gloss?: string;
+  transliteration?: string;
+  pos?: string;
+  morph?: string;
+  lemma?: string;
 }
 
 interface SavedHighlight {
@@ -74,6 +86,7 @@ export default function PassagePage({ params }: PassagePageProps) {
   const [highlightIds, setHighlightIds] = useState<Record<number, string>>({});
   const [bookmarked, setBookmarked] = useState(false);
   const [fontSize, setFontSize] = useState<number | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false); // Hebrew/Greek toggle
   const prefsApplied = useRef(false);
 
   useEffect(() => {
@@ -151,11 +164,19 @@ export default function PassagePage({ params }: PassagePageProps) {
       });
   }, [isAuthed, get]);
 
-  const handleWordClick = useCallback((word: string, strongsNumber?: string) => {
+  const handleWordClick = useCallback((word: string, strongsNumber?: string, wordData?: WordData) => {
     const cleaned = word.replace(/[^a-zA-Z]/g, "").toLowerCase();
     const display = strongsNumber ? word : cleaned;
     if (!display && !strongsNumber) return;
-    setSelectedWord({ word: display, strongs: strongsNumber });
+    setSelectedWord({
+      word: display,
+      strongs: strongsNumber,
+      gloss: wordData?.gloss,
+      transliteration: wordData?.transliteration,
+      pos: wordData?.pos,
+      morph: wordData?.morph,
+      lemma: wordData?.lemma,
+    });
   }, []);
 
   const handleHighlight = useCallback(
@@ -233,6 +254,17 @@ export default function PassagePage({ params }: PassagePageProps) {
             >
               <Bookmark className="h-4 w-4" fill={bookmarked ? "currentColor" : "none"} />
             </button>
+            <button
+              onClick={() => setShowOriginal(!showOriginal)}
+              title={showOriginal ? "Hide Hebrew/Greek" : "Show Hebrew/Greek"}
+              className={cn(
+                "flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-xs font-medium transition-colors duration-150 ease-out hover:border-accent hover:text-accent",
+                showOriginal && "border-accent text-accent",
+              )}
+            >
+              <span className="font-serif">א</span>
+              <span>Original</span>
+            </button>
             <LayerPills value={layer} onChange={setLayer} />
             <TranslationSelector value={translation} onChange={setTranslation} />
           </div>
@@ -264,6 +296,7 @@ export default function PassagePage({ params }: PassagePageProps) {
           activeVerse={activeVerse}
           highlightedVerses={highlightedVerses}
           fontSize={fontSize ?? undefined}
+          showOriginal={showOriginal}
           onHighlight={handleHighlight}
           onWordClick={handleWordClick}
         />
@@ -273,7 +306,19 @@ export default function PassagePage({ params }: PassagePageProps) {
 
       <ChapterNav book={book} chapter={parseInt(chapter)} totalChapters={totalChapters} />
 
-      <InspectorPanel word={selectedWord?.word ?? null} strongsNumber={selectedWord?.strongs} onClose={() => setSelectedWord(null)} />
+      {layer >= 2 && <PassageTimeline bookId={book} />}
+      {layer >= 2 && <ParallelPassages book={book} chapter={parseInt(chapter)} />}
+
+      <InspectorPanel
+        word={selectedWord?.word ?? null}
+        strongsNumber={selectedWord?.strongs}
+        gloss={selectedWord?.gloss}
+        transliteration={selectedWord?.transliteration}
+        pos={selectedWord?.pos}
+        morph={selectedWord?.morph}
+        lemma={selectedWord?.lemma}
+        onClose={() => setSelectedWord(null)}
+      />
     </PageTransition>
   );
 }

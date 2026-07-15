@@ -11,6 +11,9 @@ interface WordToken {
   strongs?: string;
   transliteration?: string;
   gloss?: string;
+  pos?: string;
+  morph?: string;
+  lemma?: string;
 }
 
 interface VerseRowProps {
@@ -20,7 +23,8 @@ interface VerseRowProps {
   highlighted?: string | null;
   active?: boolean;
   layer?: number;
-  onWordClick?: (word: string, strongsNumber?: string) => void;
+  showOriginal?: boolean;
+  onWordClick?: (word: string, strongsNumber?: string, wordData?: WordToken) => void;
   onHighlight?: (verseNum: number, color: string) => void;
   fontSize?: number;
   index?: number;
@@ -33,6 +37,7 @@ export function VerseRow({
   highlighted,
   active = false,
   layer = 1,
+  showOriginal = false,
   onWordClick,
   onHighlight,
   fontSize,
@@ -42,7 +47,8 @@ export function VerseRow({
     const cleaned = raw.replace(/[^a-zA-Z]/g, "");
     if (!cleaned || !onWordClick) return;
     const strongsNumber = resolveStrongs(cleaned, words);
-    onWordClick(cleaned, strongsNumber);
+    const wordData = words?.find(w => w.strongs === strongsNumber);
+    onWordClick(cleaned, strongsNumber, wordData);
   };
 
   return (
@@ -64,28 +70,56 @@ export function VerseRow({
         </span>
         {onHighlight && <Highlighter verseNum={num} onHighlight={onHighlight} />}
       </div>
-      <div className="flex-1">
-        <p
-          className="flex-1 text-[1.05rem] leading-8 text-primary"
-          style={fontSize ? { fontSize: `${fontSize}px`, lineHeight: 1.7 } : undefined}
-        >
-          {text.split(" ").map((word, i) => (
-            <span
-              key={i}
-              onClick={() => handleEnglishWord(word)}
-              className="cursor-pointer rounded-sm px-[1px] transition-colors duration-150 ease-out hover:bg-accent-subtle/60 hover:text-accent"
-              title={`Click to inspect "${word.replace(/[^a-zA-Z]/g, "")}"`}
+      <div className="flex-1 min-w-0">
+        {showOriginal && words && words.length > 0 ? (
+          <div className="space-y-1">
+            <div className="flex flex-wrap gap-x-2 gap-y-0 leading-8" dir="rtl" lang="he">
+              {words.map((w) => (
+                <button
+                  key={w.position}
+                  onClick={() => onWordClick?.(w.hebrew ?? "", w.strongs, w)}
+                  className="group/word flex flex-col items-center leading-none"
+                  title={`${w.transliteration ?? ""} — ${w.gloss ?? ""}`}
+                >
+                  <span className="font-medium text-heading text-lg transition-colors duration-150 ease-out hover:text-accent">
+                    {w.hebrew}
+                  </span>
+                  <span className="text-[10px] text-muted group-hover/word:text-accent whitespace-nowrap">
+                    {w.gloss || w.transliteration}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p
+              className="text-sm leading-6 text-muted border-t border-dashed border-border pt-1"
+              style={fontSize ? { fontSize: `${fontSize * 0.8}px` } : undefined}
             >
-              {word}{" "}
-            </span>
-          ))}
-        </p>
-        {layer === 3 && words && words.length > 0 && (
+              {text}
+            </p>
+          </div>
+        ) : (
+          <p
+            className="text-[1.05rem] leading-8 text-primary"
+            style={fontSize ? { fontSize: `${fontSize}px`, lineHeight: 1.7 } : undefined}
+          >
+            {text.split(" ").map((word, i) => (
+              <span
+                key={i}
+                onClick={() => handleEnglishWord(word)}
+                className="cursor-pointer rounded-sm px-[1px] transition-colors duration-150 ease-out hover:bg-accent-subtle/60 hover:text-accent"
+                title={`Click to inspect "${word.replace(/[^a-zA-Z]/g, "")}"`}
+              >
+                {word}{" "}
+              </span>
+            ))}
+          </p>
+        )}
+        {!showOriginal && layer === 3 && words && words.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-dashed border-border pt-2">
-            {words.map((w) => (
+              {words.map((w) => (
               <button
                 key={w.position}
-                onClick={() => onWordClick?.(w.hebrew ?? "", w.strongs)}
+                onClick={() => onWordClick?.(w.hebrew ?? "", w.strongs, w)}
                 className="group/word flex flex-col items-center leading-none"
                 title={`${w.transliteration ?? ""} — ${w.gloss ?? ""}`}
               >
