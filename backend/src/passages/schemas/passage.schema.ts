@@ -6,6 +6,8 @@ class WordData {
   hebrew?: string;
   greek?: string;
   strongs?: string;
+  transliteration?: string;
+  gloss?: string;
   stepbible?: string;
   etcbc?: string;
 }
@@ -31,7 +33,7 @@ export class Passage extends Document {
   @Prop({ required: true, index: true })
   chapter: number;
 
-  @Prop({ type: [{ num: Number, text: String, translation: String, words: [{ position: Number, hebrew: String, greek: String, strongs: String, stepbible: String, etcbc: String }] }] })
+  @Prop({ type: [{ num: Number, text: String, translation: String, words: [{ position: Number, hebrew: String, greek: String, strongs: String, transliteration: String, gloss: String, stepbible: String, etcbc: String }] }] })
   verses: Verse[];
 
   @Prop({ type: { section: String, genre: String, dateRange: String } })

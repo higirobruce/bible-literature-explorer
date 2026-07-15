@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+backend/dist/
+
+# Accidental large data clones at repo root (data lives under backend/scripts/data)
+/macula-hebrew/
+/strongs/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+*.log
+.DS_Store

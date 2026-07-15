@@ -1,15 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { TopicGrid } from "@/components/home/TopicGrid";
 import { ContinueReading } from "@/components/home/ContinueReading";
+import { HomeSearch } from "@/components/home/HomeSearch";
 
 const topics = [
   { name: "People", href: "/explore" },
   { name: "Places", href: "/explore" },
-  { name: "Timeline", href: "#" },
-  { name: "Maps", href: "#" },
-  { name: "Texts", href: "/passage/genesis/1" },
+  { name: "Texts", href: "/passage/gen/1" },
   { name: "Concepts", href: "/explore" },
-  { name: "Manuscripts", href: "#" },
 ];
 
 export default function HomePage() {
@@ -23,16 +21,7 @@ export default function HomePage() {
         <p className="mt-2 text-secondary">
           Ask a question, search a passage, or browse a topic.
         </p>
-        <div className="mx-auto mt-6 flex max-w-lg">
-          <input
-            type="text"
-            placeholder='e.g. "Who are the Nephilim?" or "Genesis 1"'
-            className="flex-1 rounded-l-lg border border-border bg-card px-4 py-3 text-sm outline-none transition-colors duration-150 ease-out focus:border-accent"
-          />
-          <button className="rounded-r-lg bg-deep-indigo px-6 py-3 text-sm font-medium text-white transition-colors duration-150 ease-out hover:bg-[#252D4A]">
-            Search
-          </button>
-        </div>
+        <HomeSearch />
       </section>
 
       <div className="flex flex-wrap justify-center gap-2">

@@ -6,6 +6,7 @@ interface Connection {
   name: string;
   type: string;
   relationship: string;
+  slug?: string;
 }
 
 interface EntityConnectionsProps {

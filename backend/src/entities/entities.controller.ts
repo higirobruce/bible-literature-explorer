@@ -10,6 +10,11 @@ export class EntitiesController {
     return this.entitiesService.search(query ?? '');
   }
 
+  @Get()
+  findAll() {
+    return this.entitiesService.findAll();
+  }
+
   @Get(':type/:slug')
   findByTypeAndSlug(
     @Param('type') type: string,

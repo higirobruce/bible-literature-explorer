@@ -10,9 +10,9 @@ class Account {
   providerId: string;
 }
 
-@Schema({ _id: false })
+  @Schema({ _id: false })
 class UserPreferences {
-  @Prop({ default: 'esv' })
+  @Prop({ default: 'web' })
   defaultTranslation: string;
 
   @Prop({ default: 16 })
@@ -60,7 +60,7 @@ export class User extends Document {
   @Prop({ type: [{ provider: String, providerId: String }], default: [] })
   accounts: Account[];
 
-  @Prop({ type: { defaultTranslation: String, fontSize: Number, theme: String }, default: { defaultTranslation: 'esv', fontSize: 16, theme: 'light' } })
+  @Prop({ type: { defaultTranslation: String, fontSize: Number, theme: String }, default: { defaultTranslation: 'web', fontSize: 16, theme: 'light' } })
   preferences: UserPreferences;
 
   @Prop({ type: [{ passageId: String, verseRange: String, color: String, note: String, createdAt: Date }], default: [] })

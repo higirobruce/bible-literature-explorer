@@ -15,19 +15,19 @@ export class Lexicon extends Document {
   @Prop()
   greek?: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   transliteration: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   pronunciation: string;
 
-  @Prop({ required: true })
+  @Prop({ default: 'Unknown' })
   partOfSpeech: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   gloss: string;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   occurrences: number;
 }
 

@@ -6,6 +6,7 @@ import { DiscoveryModule } from './discovery/discovery.module';
 import { EntitiesModule } from './entities/entities.module';
 import { UserModule } from './user/user.module';
 import { LexiconModule } from './lexicon/lexicon.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LexiconModule } from './lexicon/lexicon.module';
     EntitiesModule,
     UserModule,
     LexiconModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

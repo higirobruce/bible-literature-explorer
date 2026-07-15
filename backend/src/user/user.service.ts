@@ -35,10 +35,9 @@ export class UserService {
 
   async addHighlight(userId: string, data: { passageId: string; verseRange: string; color: string }) {
     const user = await this.ensureUser(userId);
-    const highlight = { ...data, createdAt: new Date() };
-    user.highlights.push(highlight);
+    user.highlights.push({ ...data, createdAt: new Date() });
     await user.save();
-    return highlight;
+    return user.highlights[user.highlights.length - 1];
   }
 
   async removeHighlight(userId: string, highlightId: string) {
@@ -80,10 +79,9 @@ export class UserService {
 
   async addNote(userId: string, data: { passageId: string; text: string }) {
     const user = await this.ensureUser(userId);
-    const note = { ...data, createdAt: new Date(), updatedAt: new Date() };
-    user.notes.push(note);
+    user.notes.push({ ...data, createdAt: new Date(), updatedAt: new Date() });
     await user.save();
-    return note;
+    return user.notes[user.notes.length - 1];
   }
 
   async updateNote(userId: string, noteId: string, text: string) {
@@ -94,5 +92,37 @@ export class UserService {
     note.updatedAt = new Date();
     await user.save();
     return note;
+  }
+
+  async deleteNote(userId: string, noteId: string) {
+    const user = await this.ensureUser(userId);
+    const index = user.notes.findIndex((n) => n._id.toString() === noteId);
+    if (index === -1) throw new NotFoundException('Note not found');
+    user.notes.splice(index, 1);
+    await user.save();
+    return { success: true };
+  }
+
+  async getPreferences(userId: string) {
+    const user = await this.ensureUser(userId);
+    return user.preferences;
+  }
+
+  async updatePreferences(
+    userId: string,
+    prefs: { defaultTranslation?: string; fontSize?: number; theme?: string },
+  ) {
+    const user = await this.ensureUser(userId);
+    if (prefs.defaultTranslation !== undefined) {
+      user.preferences.defaultTranslation = prefs.defaultTranslation;
+    }
+    if (prefs.fontSize !== undefined) {
+      user.preferences.fontSize = prefs.fontSize;
+    }
+    if (prefs.theme !== undefined) {
+      user.preferences.theme = prefs.theme;
+    }
+    await user.save();
+    return user.preferences;
   }
 }
