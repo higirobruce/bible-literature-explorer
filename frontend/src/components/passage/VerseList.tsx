@@ -7,6 +7,9 @@ interface WordToken {
   strongs?: string;
   transliteration?: string;
   gloss?: string;
+  pos?: string;
+  morph?: string;
+  lemma?: string;
 }
 
 interface Verse {
@@ -22,7 +25,8 @@ interface VerseListProps {
   highlightedVerses?: Record<number, string>;
   onHighlight?: (verseNum: number) => void;
   fontSize?: number;
-  onWordClick?: (word: string, strongsNumber?: string) => void;
+  showOriginal?: boolean;
+  onWordClick?: (word: string, strongsNumber?: string, wordData?: WordToken) => void;
 }
 
 export function VerseList({
@@ -32,6 +36,7 @@ export function VerseList({
   highlightedVerses,
   onHighlight,
   fontSize,
+  showOriginal,
   onWordClick,
 }: VerseListProps) {
   if (verses.length === 0) {
@@ -55,6 +60,7 @@ export function VerseList({
           highlighted={highlightedVerses?.[verse.num]}
           onHighlight={onHighlight}
           fontSize={fontSize}
+          showOriginal={showOriginal}
           onWordClick={onWordClick}
           index={i}
         />
